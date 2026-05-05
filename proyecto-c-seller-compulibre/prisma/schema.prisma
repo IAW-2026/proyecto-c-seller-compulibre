@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SellerProfile {
+  id             String   @id @default(cuid())
+  clerk_user_id  String   @unique
+  store_name     String
+  contact_email  String
+
+  products       Product[]
+  orders         SellerOrder[]
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  seller_id        String
+  name            String
+  category        String
+  price           Decimal  @db.Decimal(10, 2)
+  brand           String
+  stock_available Int
+  condition       ProductCondition
+
+  seller          SellerProfile @relation(fields: [seller_id], references: [id])
+  orderItems      SellerOrderItem[]
+
+  @@index([name])
+  @@index([category])
+  @@index([brand])
+}
+
+enum ProductCondition {
+  NEW
+  USED
+  REFURBISHED
+}
+
+model SellerOrder {
+  id                       String   @id @default(cuid())
+  external_buyer_order_id  String
+  seller_id                String
+  status                   String
+
+  seller       SellerProfile @relation(fields: [seller_id], references: [id])
+  items        SellerOrderItem[]
+}
+
+model SellerOrderItem {
+  id              String @id @default(cuid())
+  product_id      String
+  seller_order_id String
+  quantity        Int
+  price           Float
+
+  product     Product     @relation(fields: [product_id], references: [id])
+  order       SellerOrder @relation(fields: [seller_order_id], references: [id])
+}
