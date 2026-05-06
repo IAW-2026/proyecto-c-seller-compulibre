@@ -1,88 +1,82 @@
 import Link from "next/link";
+import Image from "next/image";
 
-export default function Home() {
+export default function Page() {
   return (
-    <>
-      {/* HERO */}
-      <section className="flex flex-col items-center justify-center text-center py-20 px-6 bg-secondary">
-        <h2 className="text-4xl font-bold mb-4 text-gray-900">
-          Vendé hardware sin complicaciones
-        </h2>
+    <main className="flex min-h-screen flex-col bg-secondary">
 
-        <p className="text-lg max-w-xl mb-6 text-gray-700">
-          Publicá tus productos, gestioná tu stock y administrá tus ventas en CompuLibre.
-        </p>
+      {/* Hero */}
+      
+      <section className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="flex flex-col items-center max-w-3xl w-full">
+          <Image
+            src="/logo.png"
+            alt="CompuLibre Logo"
+            width={350}
+            height={350}
+            className="w-64 h-64 md:w-70 md:h-70 lg:w-80 lg:h-80"
+            priority
+          />
 
-        <div className="flex gap-4">
-          <Link
-            href="/register"
-            className="bg-highlight text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90"
-          >
-            Empezar a vender
-          </Link>
+          <h2 className="text-5xl font-bold tracking-tight text-primary">
+            Vendé hardware y periféricos en CompuLibre
+          </h2>
 
-          <Link
-            href="/login"
-            className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90"
-          >
-            Ya tengo cuenta
-          </Link>
-        </div>
-      </section>
+          <p className="mt-6 text-lg leading-8 text-gray-700">
+            Gestioná tu catálogo, controlá tu stock y seguí tus ventas
+            desde un único dashboard moderno y simple.
+          </p>
 
-      {/* FEATURES */}
-      <section className="px-8 py-12 bg-secondary">
-        <h3 className="text-2xl font-semibold mb-8 text-center text-gray-900">
-          Todo lo que necesitás para vender
-        </h3>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row w-full">
+            <Link
+              href="/sign-up"
+              className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto"
+            >
+              Empezar a vender
+            </Link>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow">
-            <h4 className="font-semibold text-lg mb-2 text-gray-900">
-              📦 Gestión de productos
-            </h4>
-            <p className="text-sm text-gray-600">
-              Publicá GPUs, CPUs, RAM y más con toda su información técnica.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow">
-            <h4 className="font-semibold text-lg mb-2 text-gray-900">
-              📊 Control de stock
-            </h4>
-            <p className="text-sm text-gray-600">
-              Mantené actualizado tu inventario en tiempo real.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow">
-            <h4 className="font-semibold text-lg mb-2 text-gray-900">
-              🚚 Gestión de ventas
-            </h4>
-            <p className="text-sm text-gray-600">
-              Seguimiento de órdenes y preparación de envíos.
-            </p>
+            <Link
+              href="/sign-in"
+              className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto"
+            >
+              Ya tengo cuenta
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-accent py-12 text-center">
-        <h3 className="text-2xl font-semibold mb-4 text-gray-900">
-          Empezá hoy mismo
-        </h3>
+      {/* Features */}
+      <section className="grid gap-6 px-6 pb-16 md:grid-cols-3">
+        <div className="rounded-2xl bg-white p-6 shadow-md">
+          <h3 className="text-xl font-semibold text-primary">
+            Gestión de stock
+          </h3>
 
-        <p className="mb-6 text-gray-800">
-          Unite a CompuLibre y comenzá a vender tus productos.
-        </p>
+          <p className="mt-3 text-gray-600">
+            Administrá productos, precios y disponibilidad en tiempo real.
+          </p>
+        </div>
 
-        <Link
-          href="/register"
-          className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90"
-        >
-          Crear cuenta de vendedor
-        </Link>
+        <div className="rounded-2xl bg-white p-6 shadow-md">
+          <h3 className="text-xl font-semibold text-primary">
+            Seguimiento de ventas
+          </h3>
+
+          <p className="mt-3 text-gray-600">
+            Visualizá órdenes, estados de envío y pagos aprobados.
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-md">
+          <h3 className="text-xl font-semibold text-primary">
+            Dashboard moderno
+          </h3>
+
+          <p className="mt-3 text-gray-600">
+            Accedé a estadísticas y controlá tu negocio desde cualquier lugar.
+          </p>
+        </div>
       </section>
-    </>
+    </main>
   );
 }
