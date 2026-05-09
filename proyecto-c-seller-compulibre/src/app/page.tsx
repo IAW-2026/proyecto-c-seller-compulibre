@@ -1,4 +1,9 @@
-import Link from "next/link";
+import {
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 import Image from "next/image";
 
 export default function Page() {
@@ -10,7 +15,7 @@ export default function Page() {
       <section className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
         <div className="flex flex-col items-center max-w-3xl w-full">
           <Image
-            src="/logo.png"
+            src="/logo5.png"
             alt="CompuLibre Logo"
             width={350}
             height={350}
@@ -27,21 +32,19 @@ export default function Page() {
             desde un único dashboard moderno y simple.
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row w-full">
-            <Link
-              href="/sign-up"
-              className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto"
-            >
-              Empezar a vender
-            </Link>
+          <Show when="signed-out">
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row w-full">
+              <SignUpButton mode="modal"><button className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto">Empezar a vender</button></SignUpButton>
 
-            <Link
-              href="/sign-in"
-              className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto"
-            >
-              Ya tengo cuenta
-            </Link>
-          </div>
+              <SignInButton mode="modal"><button className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto">Ya tengo cuenta</button></SignInButton>
+            </div>
+          </Show>
+
+          <Show when="signed-in">
+            <div className="mt-10 flex items-center justify-center">
+              <UserButton />
+            </div>
+          </Show>
         </div>
       </section>
 

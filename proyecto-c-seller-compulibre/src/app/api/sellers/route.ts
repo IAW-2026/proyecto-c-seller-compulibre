@@ -11,7 +11,6 @@ export async function POST(req: Request) {
 
     const seller = await prisma.sellerProfile.create({
       data: {
-        id: body.id, 
         clerk_user_id: body.clerkUserId,
         store_name: body.storeName,
         contact_email: body.contactEmail
