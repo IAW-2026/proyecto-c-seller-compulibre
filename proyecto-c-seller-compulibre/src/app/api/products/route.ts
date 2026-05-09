@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         category: body.category,
         price: body.price,
         brand: body.brand,
-        stock_available: body.stock,
+        stock: body.stock,
         condition: body.condition,
         seller_id: body.sellerId,
       },
