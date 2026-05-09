@@ -6,7 +6,11 @@ import {
 } from "@clerk/nextjs";
 import Image from "next/image";
 
-export default function Page() {
+import { redirectSignedInUserToDashboard } from "@/lib/auth";
+
+export default async function Page() {
+  await redirectSignedInUserToDashboard();
+
   return (
     <main className="flex min-h-screen flex-col bg-secondary">
 
@@ -34,9 +38,9 @@ export default function Page() {
 
           <Show when="signed-out">
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row w-full">
-              <SignUpButton mode="modal"><button className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto">Empezar a vender</button></SignUpButton>
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard"><button className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto">Empezar a vender</button></SignUpButton>
 
-              <SignInButton mode="modal"><button className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto">Ya tengo cuenta</button></SignInButton>
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard"><button className="w-full rounded-2xl border border-primary bg-highlight px-8 py-4 text-center text-lg font-semibold text-white shadow-lg transition hover:scale-[1.05] sm:w-auto">Ya tengo cuenta</button></SignInButton>
             </div>
           </Show>
 
