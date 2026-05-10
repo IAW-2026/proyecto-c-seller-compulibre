@@ -20,7 +20,7 @@ export default async function SalesPage() {
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
         <div className="overflow-x-auto">
           {sales.length > 0 ? (
-            <table className="w-full min-w-[640px] text-left text-sm">
+            <table className="w-full min-w-160 text-left text-sm">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Orden</th>

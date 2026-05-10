@@ -35,6 +35,10 @@ export type ProductRow = {
   condition: string;
   status: string;
   imageUrl: string | null;
+  images: {
+    id: string;
+    imageUrl: string;
+  }[];
   createdAt: string;
   updatedAt: string;
 };
@@ -100,6 +104,10 @@ function serializeProduct(product: ProductWithImages): ProductRow {
     condition: product.condition,
     status: getProductStatus(product.stock),
     imageUrl: product.images[0]?.image_url ?? null,
+    images: product.images.map((image) => ({
+      id: image.id,
+      imageUrl: image.image_url,
+    })),
     createdAt: product.created_at.toISOString(),
     updatedAt: product.updated_at.toISOString(),
   };

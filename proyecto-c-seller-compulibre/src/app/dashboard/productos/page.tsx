@@ -16,15 +16,18 @@ export default async function ProductsPage() {
             Catalogo de venta
           </h1>
         </div>
-        <button className="rounded-lg bg-highlight px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/90">
+        <Link
+          href="/dashboard/productos/nuevo"
+          className="rounded-lg bg-highlight px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
+        >
           Nuevo producto
-        </button>
+        </Link>
       </header>
 
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
         <div className="overflow-x-auto">
           {products.length > 0 ? (
-            <table className="w-full min-w-[640px] text-left text-sm">
+            <table className="w-full min-w-160 text-left text-sm">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Producto</th>

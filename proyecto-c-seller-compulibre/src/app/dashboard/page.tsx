@@ -30,11 +30,8 @@ export default async function Page() {
           Inicio
         </p>
         <h1 className="mt-2 text-3xl font-bold text-primary">
-          Dashboard del vendedor
+          Dashboard
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-          Una vista rapida para revisar tu catalogo, stock y ventas recientes.
-        </p>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -60,7 +57,7 @@ export default async function Page() {
         </div>
         <div className="overflow-x-auto">
           {products.length > 0 ? (
-            <table className="w-full min-w-[620px] text-left text-sm">
+            <table className="w-full min-w-155 text-left text-sm">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Producto</th>

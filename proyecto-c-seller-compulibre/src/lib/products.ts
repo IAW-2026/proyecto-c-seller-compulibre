@@ -37,6 +37,16 @@ export type CreateProductInput = {
   stock: number
   condition: ProductCondition
   imageUrls?: string[]
+  imageUploads?: ProductImageUpload[]
+}
+
+export type ProductImageUpload = {
+  id: string
+  imageUrl: string
+  mimeType: string
+  originalName: string
+  size: number
+  data: Buffer
 }
 
 export type UpdateProductInput = Partial<
@@ -110,6 +120,19 @@ export async function createProduct(
   input: CreateProductInput
 ): Promise<Product> {
   const imageUrls = cleanImageUrls(input.imageUrls)
+  const images = [
+    ...imageUrls.map((imageUrl) => ({
+      image_url: imageUrl,
+    })),
+    ...(input.imageUploads ?? []).map((image) => ({
+      id: image.id,
+      image_url: image.imageUrl,
+      mime_type: image.mimeType,
+      original_name: image.originalName,
+      size: image.size,
+      image_data: image.data,
+    })),
+  ]
 
   const product = await prisma.product.create({
     data: {
@@ -121,11 +144,9 @@ export async function createProduct(
       brand: input.brand,
       stock: input.stock,
       condition: input.condition,
-      images: imageUrls.length
+      images: images.length
         ? {
-            create: imageUrls.map((imageUrl) => ({
-              image_url: imageUrl,
-            })),
+            create: images,
           }
         : undefined,
     },

@@ -68,6 +68,22 @@ export default async function ProductPage({
         </article>
       </section>
 
+      {product.images.length > 0 ? (
+        <section className="rounded-lg border border-primary/10 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-primary">Imagenes</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {product.images.map((image) => (
+              <img
+                key={image.id}
+                src={image.imageUrl}
+                alt={product.name}
+                className="aspect-video w-full rounded-lg border border-primary/10 object-cover"
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="rounded-lg border border-primary/10 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-primary">Descripcion</h2>
         <p className="mt-3 text-sm leading-6 text-gray-600">
