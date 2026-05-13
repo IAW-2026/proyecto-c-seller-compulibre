@@ -1,3 +1,4 @@
+import { PencilIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 import { fetchProducts } from "@/lib/data";
@@ -35,6 +36,9 @@ export default async function ProductsPage() {
                   <th className="px-5 py-3 font-semibold">Stock</th>
                   <th className="px-5 py-3 font-semibold">Precio</th>
                   <th className="px-5 py-3 font-semibold">Estado</th>
+                  <th className="px-5 py-3">
+                    <span className="sr-only">Editar</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-primary/10">
@@ -61,6 +65,15 @@ export default async function ProductsPage() {
                       <span className="rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
                         {product.status}
                       </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <Link
+                        href={`/dashboard/productos/${product.id}/edit`}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-primary/15 text-primary transition hover:bg-accent/35"
+                      >
+                        <span className="sr-only">Editar producto</span>
+                        <PencilIcon className="h-4 w-4" aria-hidden="true" />
+                      </Link>
                     </td>
                   </tr>
                 ))}

@@ -30,6 +30,7 @@ export type ProductRow = {
   description: string | null;
   category: string;
   price: string;
+  priceValue: string;
   brand: string;
   stock: number;
   condition: string;
@@ -99,6 +100,7 @@ function serializeProduct(product: ProductWithImages): ProductRow {
     description: product.description,
     category: product.category,
     price: formatMoney(product.price),
+    priceValue: product.price.toString(),
     brand: product.brand,
     stock: product.stock,
     condition: product.condition,

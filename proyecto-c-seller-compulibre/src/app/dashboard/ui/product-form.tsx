@@ -28,9 +28,35 @@ const conditionLabels: Record<ProductCondition, string> = {
   REFURBISHED: "Reacondicionado",
 };
 
-export function ProductForm() {
+export type ProductFormValues = {
+  name: string;
+  brand: string;
+  category: string;
+  condition: string;
+  description: string | null;
+  priceValue: string;
+  stock: number;
+  images?: {
+    id: string;
+    imageUrl: string;
+  }[];
+};
+
+type ProductFormProps = {
+  action?: (formData: FormData) => Promise<void>;
+  product?: ProductFormValues;
+  submitLabel?: string;
+  imageHelpText?: string;
+};
+
+export function ProductForm({
+  action = createProductFromForm,
+  product,
+  submitLabel = "Guardar producto",
+  imageHelpText,
+}: ProductFormProps) {
   return (
-    <form action={createProductFromForm} className="flex flex-col gap-6">
+    <form action={action} className="flex flex-col gap-6">
       <section className="rounded-lg border border-primary/10 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-primary">
           Informacion principal
@@ -43,6 +69,7 @@ export function ProductForm() {
               required
               name="name"
               type="text"
+              defaultValue={product?.name}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </label>
@@ -53,6 +80,7 @@ export function ProductForm() {
               required
               name="brand"
               type="text"
+              defaultValue={product?.brand}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </label>
@@ -62,7 +90,7 @@ export function ProductForm() {
             <select
               required
               name="category"
-              defaultValue=""
+              defaultValue={product?.category ?? ""}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
               <option value="" disabled>
@@ -81,7 +109,7 @@ export function ProductForm() {
             <select
               required
               name="condition"
-              defaultValue=""
+              defaultValue={product?.condition ?? ""}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
               <option value="" disabled>
@@ -101,6 +129,7 @@ export function ProductForm() {
           <textarea
             name="description"
             rows={4}
+            defaultValue={product?.description ?? ""}
             className="resize-y rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
           />
         </label>
@@ -118,6 +147,7 @@ export function ProductForm() {
               type="number"
               min="0"
               step="0.01"
+              defaultValue={product?.priceValue}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </label>
@@ -130,12 +160,34 @@ export function ProductForm() {
               type="number"
               min="0"
               step="1"
+              defaultValue={product?.stock}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </label>
         </div>
 
         <ImageUploadField />
+        {product?.images?.length ? (
+          <div className="mt-4">
+            <p className="text-sm font-medium text-gray-700">
+              Imagenes actuales
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {product.images.map((image) => (
+                <img
+                  key={image.id}
+                  src={image.imageUrl}
+                  alt={product.name}
+                  className="aspect-video w-full rounded-lg border border-primary/10 object-cover"
+                />
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              {imageHelpText ??
+                "Si elegis nuevas imagenes, van a reemplazar las actuales."}
+            </p>
+          </div>
+        ) : null}
       </section>
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -149,7 +201,7 @@ export function ProductForm() {
           type="submit"
           className="rounded-lg bg-highlight px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
         >
-          Guardar producto
+          {submitLabel}
         </button>
       </div>
     </form>
