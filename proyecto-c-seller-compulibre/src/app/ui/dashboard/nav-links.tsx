@@ -1,18 +1,25 @@
 "use client";
 
+import {
+  Cog6ToothIcon,
+  CubeIcon,
+  HomeIcon,
+  ShoppingCartIcon,
+} from "@heroicons/react/24/outline";
+import type { ComponentType, SVGProps } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { name: "Inicio", href: "/dashboard", symbol: "I" },
-  { name: "Productos", href: "/dashboard/productos", symbol: "P" },
-  { name: "Ventas", href: "/dashboard/ventas", symbol: "V" },
+  { name: "Inicio", href: "/dashboard", icon: HomeIcon },
+  { name: "Productos", href: "/dashboard/productos", icon: CubeIcon },
+  { name: "Ventas", href: "/dashboard/ventas", icon: ShoppingCartIcon },
 ];
 
 const settingsLink = {
   name: "Configuracion",
   href: "/dashboard/configuracion",
-  symbol: "C",
+  icon: Cog6ToothIcon,
 };
 
 function getIsActive(pathname: string, href: string) {
@@ -22,11 +29,11 @@ function getIsActive(pathname: string, href: string) {
 function DashboardNavLink({
   href,
   name,
-  symbol,
+  icon: Icon,
 }: {
   href: string;
   name: string;
-  symbol: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
 }) {
   const pathname = usePathname();
   const isActive = getIsActive(pathname, href);
@@ -43,12 +50,12 @@ function DashboardNavLink({
     >
       <span
         className={[
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
           isActive ? "bg-white/15 text-white" : "bg-secondary text-primary",
         ].join(" ")}
         aria-hidden="true"
       >
-        {symbol}
+        <Icon className="h-5 w-5" />
       </span>
       <span className="truncate">{name}</span>
     </Link>
