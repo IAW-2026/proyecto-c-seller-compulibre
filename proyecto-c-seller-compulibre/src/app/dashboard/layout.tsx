@@ -2,8 +2,12 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 import { requireDashboardUser } from "@/lib/auth";
+import { ensureSellerProfile } from "@/lib/sellers";
 
-import { DashboardNavLinks } from "@/app/ui/dashboard/nav-links";
+import {
+  DashboardNavLinks,
+  DashboardSettingsLink,
+} from "@/app/ui/dashboard/nav-links";
 
 export default async function DashboardLayout({
   children,
@@ -11,9 +15,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireDashboardUser();
-  const displayName =
-    user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress;
-  const email = user?.primaryEmailAddress?.emailAddress;
+  const seller = await ensureSellerProfile(user);
+  const displayName = seller.store_name;
+  const email = seller.contact_email;
 
   return (
     <div className="min-h-screen bg-secondary text-gray-950 md:flex">
@@ -34,23 +38,31 @@ export default async function DashboardLayout({
           </Link>
 
           <DashboardNavLinks />
+
+          <div className="md:hidden">
+            <DashboardSettingsLink />
+          </div>
         </div>
 
-        <div className="hidden border-t border-primary/10 p-6 md:mt-auto md:flex md:items-center md:gap-3">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "h-10 w-10",
-              },
-            }}
-          />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-gray-900">
-              {displayName || "Vendedor"}
-            </p>
-            {email ? (
-              <p className="truncate text-xs text-gray-500">{email}</p>
-            ) : null}
+        <div className="hidden border-t border-primary/10 p-6 md:mt-auto md:flex md:flex-col md:gap-4">
+          <DashboardSettingsLink />
+
+          <div className="flex items-center gap-3">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "h-10 w-10",
+                },
+              }}
+            />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-gray-900">
+                {displayName || "Vendedor"}
+              </p>
+              {email ? (
+                <p className="truncate text-xs text-gray-500">{email}</p>
+              ) : null}
+            </div>
           </div>
         </div>
       </aside>
