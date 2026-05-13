@@ -43,15 +43,11 @@ model Product {
 }
 
 model ProductImage {
-  id            String  @id @default(cuid())
-  product_id    String
-  image_url     String
-  mime_type     String?
-  original_name String?
-  size          Int?
-  image_data    Bytes?
+  id          String  @id @default(cuid())
+  product_id  String
+  image_url   String
 
-  product       Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model SellerOrder {

@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import path from "node:path";
 
 import { ProductCategory, ProductCondition } from "@prisma/client";
@@ -8,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireDashboardUser } from "./auth";
+import { uploadProductImagesToCloudinary } from "./cloudinary";
 import { createProduct } from "./products";
 import { ensureSellerProfile } from "./sellers";
 
@@ -97,7 +97,7 @@ function getImageExtension(file: File) {
   throw new Error("Solo se pueden cargar imagenes JPG, PNG, WebP o GIF");
 }
 
-async function prepareProductImages(formData: FormData) {
+function readImageFiles(formData: FormData) {
   const files = formData
     .getAll("images")
     .filter((file): file is File => file instanceof File && file.size > 0);
@@ -106,32 +106,25 @@ async function prepareProductImages(formData: FormData) {
     return [];
   }
 
-  return Promise.all(
-    files.map(async (file) => {
-      if (!file.type.startsWith("image/")) {
-        throw new Error("Solo se pueden cargar archivos de imagen");
-      }
+  files.forEach((file) => {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Solo se pueden cargar archivos de imagen");
+    }
 
-      getImageExtension(file);
-      const imageId = randomUUID();
-      const bytes = await file.arrayBuffer();
+    getImageExtension(file);
+  });
 
-      return {
-        id: imageId,
-        imageUrl: `/api/product-images/${imageId}`,
-        mimeType: file.type,
-        originalName: file.name,
-        size: file.size,
-        data: Buffer.from(bytes),
-      };
-    })
-  );
+  return files;
 }
 
 export async function createProductFromForm(formData: FormData) {
   const user = await requireDashboardUser();
   const seller = await ensureSellerProfile(user);
-  const imageUploads = await prepareProductImages(formData);
+  const imageFiles = readImageFiles(formData);
+  const imageUrls = await uploadProductImagesToCloudinary(
+    imageFiles,
+    seller.clerk_user_id
+  );
 
   const product = await createProduct({
     sellerId: seller.clerk_user_id,
@@ -142,7 +135,7 @@ export async function createProductFromForm(formData: FormData) {
     brand: readRequiredString(formData, "brand"),
     stock: readRequiredInteger(formData, "stock"),
     condition: readCondition(formData),
-    imageUploads,
+    imageUrls,
   });
 
   revalidatePath("/dashboard");
