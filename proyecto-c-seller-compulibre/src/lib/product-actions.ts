@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 
 import { requireDashboardUser } from "./auth";
 import { uploadProductImagesToCloudinary } from "./cloudinary";
-import { createProduct, updateProduct } from "./products";
+import { createProduct, deleteProduct, updateProduct } from "./products";
 import { ensureSellerProfile } from "./sellers";
 
 function readRequiredString(formData: FormData, field: string) {
@@ -170,4 +170,15 @@ export async function updateProductFromForm(
   revalidatePath("/dashboard/productos");
   revalidatePath(`/dashboard/productos/${productId}`);
   redirect(`/dashboard/productos/${productId}`);
+}
+
+export async function deleteProductFromForm(productId: string) {
+  const user = await requireDashboardUser();
+  const seller = await ensureSellerProfile(user);
+
+  await deleteProduct(productId, seller.clerk_user_id);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/productos");
+  redirect("/dashboard/productos");
 }
