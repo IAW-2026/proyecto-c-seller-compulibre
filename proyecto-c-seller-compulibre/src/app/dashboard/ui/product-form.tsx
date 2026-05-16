@@ -144,9 +144,8 @@ export function ProductForm({
             <input
               required
               name="price"
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               defaultValue={product?.priceValue}
               className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-gray-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
             />

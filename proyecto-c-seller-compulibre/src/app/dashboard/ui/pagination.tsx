@@ -20,9 +20,13 @@ function generatePagination(currentPage: number, totalPages: number) {
   return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
 }
 
-function createPageUrl(page: number) {
+function createPageUrl(page: number, query: string) {
   const params = new URLSearchParams();
   params.set("page", page.toString());
+
+  if (query) {
+    params.set("query", query);
+  }
 
   return `/dashboard/productos?${params.toString()}`;
 }
@@ -59,9 +63,11 @@ function PaginationArrow({
 export function Pagination({
   currentPage,
   totalPages,
+  query = "",
 }: {
   currentPage: number;
   totalPages: number;
+  query?: string;
 }) {
   if (totalPages <= 1) {
     return null;
@@ -73,7 +79,7 @@ export function Pagination({
     <div className="flex items-center justify-center gap-2">
       <PaginationArrow
         direction="left"
-        href={createPageUrl(currentPage - 1)}
+        href={createPageUrl(currentPage - 1, query)}
         isDisabled={currentPage <= 1}
       />
 
@@ -96,7 +102,7 @@ export function Pagination({
           return (
             <Link
               key={pageNumber}
-              href={createPageUrl(pageNumber)}
+              href={createPageUrl(pageNumber, query)}
               className={[
                 "inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition",
                 isActive
@@ -112,7 +118,7 @@ export function Pagination({
 
       <PaginationArrow
         direction="right"
-        href={createPageUrl(currentPage + 1)}
+        href={createPageUrl(currentPage + 1, query)}
         isDisabled={currentPage >= totalPages}
       />
     </div>

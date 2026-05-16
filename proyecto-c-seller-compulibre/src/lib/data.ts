@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProductCategory } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 import { prisma } from "./prisma";
@@ -133,6 +133,29 @@ function serializeSale(order: OrderWithItems): SaleRow {
   };
 }
 
+function getProductsWhere(sellerId: string, query: string) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return { seller_id: sellerId } satisfies Prisma.ProductWhereInput;
+  }
+
+  const productFilters: Prisma.ProductWhereInput[] = [
+    { name: { contains: trimmedQuery, mode: "insensitive" } },
+    { brand: { contains: trimmedQuery, mode: "insensitive" } },
+  ];
+  const categoryQuery = trimmedQuery.toUpperCase();
+
+  if (Object.values(ProductCategory).includes(categoryQuery as ProductCategory)) {
+    productFilters.push({ category: { equals: categoryQuery as ProductCategory } });
+  }
+
+  return {
+    seller_id: sellerId,
+    OR: productFilters,
+  } satisfies Prisma.ProductWhereInput;
+}
+
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const sellerId = await getAuthenticatedSellerId();
 
@@ -203,13 +226,17 @@ export async function fetchProducts(): Promise<ProductRow[]> {
   return products.map(serializeProduct);
 }
 
-export async function fetchProductsPage(page: number): Promise<ProductRow[]> {
+export async function fetchProductsPage(
+  query: string,
+  page: number
+): Promise<ProductRow[]> {
   const sellerId = await getAuthenticatedSellerId();
   const currentPage = Math.max(page, 1);
   const offset = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const where = getProductsWhere(sellerId, query);
 
   const products = await prisma.product.findMany({
-    where: { seller_id: sellerId },
+    where,
     include: productWithImages,
     orderBy: { created_at: "desc" },
     skip: offset,
@@ -219,10 +246,11 @@ export async function fetchProductsPage(page: number): Promise<ProductRow[]> {
   return products.map(serializeProduct);
 }
 
-export async function fetchProductsPages() {
+export async function fetchProductsPages(query: string) {
   const sellerId = await getAuthenticatedSellerId();
+  const where = getProductsWhere(sellerId, query);
   const count = await prisma.product.count({
-    where: { seller_id: sellerId },
+    where,
   });
 
   return Math.ceil(count / PRODUCTS_PER_PAGE);

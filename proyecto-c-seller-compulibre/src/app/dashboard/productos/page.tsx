@@ -1,8 +1,10 @@
+import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 import { DeleteProductButton } from "@/app/dashboard/ui/delete-product-button";
 import { EditProductButton } from "@/app/dashboard/ui/edit-product-button";
 import { Pagination } from "@/app/dashboard/ui/pagination";
+import { Search } from "@/app/dashboard/ui/search";
 import { fetchProductsPage, fetchProductsPages } from "@/lib/data";
 
 function getCurrentPage(page?: string) {
@@ -18,13 +20,14 @@ function getCurrentPage(page?: string) {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; query?: string }>;
 }) {
   const params = await searchParams;
   const currentPage = getCurrentPage(params.page);
+  const query = params.query ?? "";
   const [products, totalPages] = await Promise.all([
-    fetchProductsPage(currentPage),
-    fetchProductsPages(),
+    fetchProductsPage(query, currentPage),
+    fetchProductsPages(query),
   ]);
 
   return (
@@ -38,13 +41,18 @@ export default async function ProductsPage({
             Catalogo de venta
           </h1>
         </div>
+      </header>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Search placeholder="Buscar productos..." />
         <Link
           href="/dashboard/productos/nuevo"
-          className="rounded-lg bg-highlight px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-highlight px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
         >
-          Nuevo producto
+          <PlusIcon className="h-5 w-5" aria-hidden="true" />
+          <span>Nuevo producto</span>
         </Link>
-      </header>
+      </div>
 
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
         <div className="overflow-x-auto">
@@ -105,7 +113,11 @@ export default async function ProductsPage({
         </div>
       </section>
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        query={query}
+      />
     </div>
   );
 }
