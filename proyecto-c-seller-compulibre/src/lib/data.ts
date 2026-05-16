@@ -16,6 +16,8 @@ const orderWithItems = {
   },
 } satisfies Prisma.SellerOrderInclude;
 
+const PRODUCTS_PER_PAGE = 10;
+
 type ProductWithImages = Prisma.ProductGetPayload<{
   include: typeof productWithImages;
 }>;
@@ -199,6 +201,31 @@ export async function fetchProducts(): Promise<ProductRow[]> {
   });
 
   return products.map(serializeProduct);
+}
+
+export async function fetchProductsPage(page: number): Promise<ProductRow[]> {
+  const sellerId = await getAuthenticatedSellerId();
+  const currentPage = Math.max(page, 1);
+  const offset = (currentPage - 1) * PRODUCTS_PER_PAGE;
+
+  const products = await prisma.product.findMany({
+    where: { seller_id: sellerId },
+    include: productWithImages,
+    orderBy: { created_at: "desc" },
+    skip: offset,
+    take: PRODUCTS_PER_PAGE,
+  });
+
+  return products.map(serializeProduct);
+}
+
+export async function fetchProductsPages() {
+  const sellerId = await getAuthenticatedSellerId();
+  const count = await prisma.product.count({
+    where: { seller_id: sellerId },
+  });
+
+  return Math.ceil(count / PRODUCTS_PER_PAGE);
 }
 
 export async function fetchProductById(

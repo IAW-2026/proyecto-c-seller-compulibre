@@ -2,10 +2,30 @@ import Link from "next/link";
 
 import { DeleteProductButton } from "@/app/dashboard/ui/delete-product-button";
 import { EditProductButton } from "@/app/dashboard/ui/edit-product-button";
-import { fetchProducts } from "@/lib/data";
+import { Pagination } from "@/app/dashboard/ui/pagination";
+import { fetchProductsPage, fetchProductsPages } from "@/lib/data";
 
-export default async function ProductsPage() {
-  const products = await fetchProducts();
+function getCurrentPage(page?: string) {
+  const currentPage = Number(page);
+
+  if (!Number.isInteger(currentPage) || currentPage < 1) {
+    return 1;
+  }
+
+  return currentPage;
+}
+
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const currentPage = getCurrentPage(params.page);
+  const [products, totalPages] = await Promise.all([
+    fetchProductsPage(currentPage),
+    fetchProductsPages(),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -69,8 +89,8 @@ export default async function ProductsPage() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">
-                        <EditProductButton productId={product.id}/>
-                        <DeleteProductButton productId={product.id}/>
+                        <EditProductButton productId={product.id} />
+                        <DeleteProductButton productId={product.id} />
                       </div>
                     </td>
                   </tr>
@@ -84,6 +104,8 @@ export default async function ProductsPage() {
           )}
         </div>
       </section>
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
     </div>
   );
 }
