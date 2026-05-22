@@ -126,7 +126,7 @@ function serializeSale(order: OrderWithItems): SaleRow {
   return {
     id: order.id,
     externalBuyerOrderId: order.external_buyer_order_id,
-    buyer: "Orden externa",
+    buyer: order.buyer_id ?? "Orden externa",
     status: order.status,
     itemsCount,
     total: formatMoney(total),
@@ -278,7 +278,7 @@ export async function fetchSales(): Promise<SaleRow[]> {
   const orders = await prisma.sellerOrder.findMany({
     where: { seller_id: sellerId },
     include: orderWithItems,
-    orderBy: { id: "desc" },
+    orderBy: { created_at: "desc" },
   });
 
   return orders.map(serializeSale);

@@ -53,13 +53,18 @@ model ProductImage {
 model SellerOrder {
   id                       String   @id @default(cuid())
   external_buyer_order_id  String
+  buyer_id                 String?
+  transaction_id           String?  @unique
   seller_id                String
   status                   String
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
 
   seller       SellerProfile @relation(fields: [seller_id], references: [clerk_user_id])
   items        SellerOrderItem[]
 
   @@index([seller_id])
+  @@index([external_buyer_order_id])
 }
 
 model SellerOrderItem {
