@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 
 import { requireDashboardUser } from "./auth";
 import { uploadProductImagesToCloudinary } from "./cloudinary";
-import { createProduct } from "./products";
+import { createProduct, deleteProduct, updateProduct } from "./products";
 import { ensureSellerProfile } from "./sellers";
 
 function readRequiredString(formData: FormData, field: string) {
@@ -141,4 +141,44 @@ export async function createProductFromForm(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/productos");
   redirect(`/dashboard/productos/${product.id}`);
+}
+
+export async function updateProductFromForm(
+  productId: string,
+  formData: FormData
+) {
+  const user = await requireDashboardUser();
+  const seller = await ensureSellerProfile(user);
+  const imageFiles = readImageFiles(formData);
+  const imageUrls =
+    imageFiles.length > 0
+      ? await uploadProductImagesToCloudinary(imageFiles, seller.clerk_user_id)
+      : undefined;
+
+  await updateProduct(productId, seller.clerk_user_id, {
+    name: readRequiredString(formData, "name"),
+    description: readOptionalString(formData, "description"),
+    category: readCategory(formData),
+    price: readRequiredNumber(formData, "price"),
+    brand: readRequiredString(formData, "brand"),
+    stock: readRequiredInteger(formData, "stock"),
+    condition: readCondition(formData),
+    imageUrls,
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/productos");
+  revalidatePath(`/dashboard/productos/${productId}`);
+  redirect(`/dashboard/productos/${productId}`);
+}
+
+export async function deleteProductFromForm(productId: string) {
+  const user = await requireDashboardUser();
+  const seller = await ensureSellerProfile(user);
+
+  await deleteProduct(productId, seller.clerk_user_id);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/productos");
+  redirect("/dashboard/productos");
 }

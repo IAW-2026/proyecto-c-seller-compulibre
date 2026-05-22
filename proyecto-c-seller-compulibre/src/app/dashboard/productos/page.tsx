@@ -1,9 +1,34 @@
+import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-import { fetchProducts } from "@/lib/data";
+import { DeleteProductButton } from "@/app/dashboard/ui/delete-product-button";
+import { EditProductButton } from "@/app/dashboard/ui/edit-product-button";
+import { Pagination } from "@/app/dashboard/ui/pagination";
+import { Search } from "@/app/dashboard/ui/search";
+import { fetchProductsPage, fetchProductsPages } from "@/lib/data";
 
-export default async function ProductsPage() {
-  const products = await fetchProducts();
+function getCurrentPage(page?: string) {
+  const currentPage = Number(page);
+
+  if (!Number.isInteger(currentPage) || currentPage < 1) {
+    return 1;
+  }
+
+  return currentPage;
+}
+
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; query?: string }>;
+}) {
+  const params = await searchParams;
+  const currentPage = getCurrentPage(params.page);
+  const query = params.query ?? "";
+  const [products, totalPages] = await Promise.all([
+    fetchProductsPage(query, currentPage),
+    fetchProductsPages(query),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -16,18 +41,23 @@ export default async function ProductsPage() {
             Catalogo de venta
           </h1>
         </div>
+      </header>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Search placeholder="Buscar productos..." />
         <Link
           href="/dashboard/productos/nuevo"
-          className="rounded-lg bg-highlight px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-highlight px-4 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
         >
-          Nuevo producto
+          <PlusIcon className="h-5 w-5" aria-hidden="true" />
+          <span>Nuevo producto</span>
         </Link>
-      </header>
+      </div>
 
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
         <div className="overflow-x-auto">
           {products.length > 0 ? (
-            <table className="w-full min-w-160 text-left text-sm">
+            <table className="w-full min-w-180 text-left text-sm">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Producto</th>
@@ -35,6 +65,9 @@ export default async function ProductsPage() {
                   <th className="px-5 py-3 font-semibold">Stock</th>
                   <th className="px-5 py-3 font-semibold">Precio</th>
                   <th className="px-5 py-3 font-semibold">Estado</th>
+                  <th className="w-28 px-5 py-3">
+                    <span className="sr-only">Acciones</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-primary/10">
@@ -58,9 +91,15 @@ export default async function ProductsPage() {
                       {product.price}
                     </td>
                     <td className="px-5 py-4">
-                      <span className="rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
+                      <span className="inline-flex whitespace-nowrap rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
                         {product.status}
                       </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex justify-end gap-2">
+                        <EditProductButton productId={product.id} />
+                        <DeleteProductButton productId={product.id} />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -73,6 +112,12 @@ export default async function ProductsPage() {
           )}
         </div>
       </section>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        query={query}
+      />
     </div>
   );
 }

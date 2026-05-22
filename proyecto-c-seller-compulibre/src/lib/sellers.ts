@@ -26,7 +26,6 @@ export async function ensureSellerProfile(user: User) {
       contact_email: getSellerEmail(user),
     },
     update: {
-      store_name: getSellerStoreName(user),
       contact_email: getSellerEmail(user),
     },
   });

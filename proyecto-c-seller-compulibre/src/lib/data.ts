@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProductCategory } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 import { prisma } from "./prisma";
@@ -16,6 +16,8 @@ const orderWithItems = {
   },
 } satisfies Prisma.SellerOrderInclude;
 
+const PRODUCTS_PER_PAGE = 10;
+
 type ProductWithImages = Prisma.ProductGetPayload<{
   include: typeof productWithImages;
 }>;
@@ -30,6 +32,7 @@ export type ProductRow = {
   description: string | null;
   category: string;
   price: string;
+  priceValue: string;
   brand: string;
   stock: number;
   condition: string;
@@ -99,6 +102,7 @@ function serializeProduct(product: ProductWithImages): ProductRow {
     description: product.description,
     category: product.category,
     price: formatMoney(product.price),
+    priceValue: product.price.toString(),
     brand: product.brand,
     stock: product.stock,
     condition: product.condition,
@@ -127,6 +131,29 @@ function serializeSale(order: OrderWithItems): SaleRow {
     itemsCount,
     total: formatMoney(total),
   };
+}
+
+function getProductsWhere(sellerId: string, query: string) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return { seller_id: sellerId } satisfies Prisma.ProductWhereInput;
+  }
+
+  const productFilters: Prisma.ProductWhereInput[] = [
+    { name: { contains: trimmedQuery, mode: "insensitive" } },
+    { brand: { contains: trimmedQuery, mode: "insensitive" } },
+  ];
+  const categoryQuery = trimmedQuery.toUpperCase();
+
+  if (Object.values(ProductCategory).includes(categoryQuery as ProductCategory)) {
+    productFilters.push({ category: { equals: categoryQuery as ProductCategory } });
+  }
+
+  return {
+    seller_id: sellerId,
+    OR: productFilters,
+  } satisfies Prisma.ProductWhereInput;
 }
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
@@ -197,6 +224,36 @@ export async function fetchProducts(): Promise<ProductRow[]> {
   });
 
   return products.map(serializeProduct);
+}
+
+export async function fetchProductsPage(
+  query: string,
+  page: number
+): Promise<ProductRow[]> {
+  const sellerId = await getAuthenticatedSellerId();
+  const currentPage = Math.max(page, 1);
+  const offset = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const where = getProductsWhere(sellerId, query);
+
+  const products = await prisma.product.findMany({
+    where,
+    include: productWithImages,
+    orderBy: { created_at: "desc" },
+    skip: offset,
+    take: PRODUCTS_PER_PAGE,
+  });
+
+  return products.map(serializeProduct);
+}
+
+export async function fetchProductsPages(query: string) {
+  const sellerId = await getAuthenticatedSellerId();
+  const where = getProductsWhere(sellerId, query);
+  const count = await prisma.product.count({
+    where,
+  });
+
+  return Math.ceil(count / PRODUCTS_PER_PAGE);
 }
 
 export async function fetchProductById(
