@@ -17,6 +17,7 @@ const orderWithItems = {
 } satisfies Prisma.SellerOrderInclude;
 
 const PRODUCTS_PER_PAGE = 10;
+const SALES_PER_PAGE = 10;
 
 type ProductWithImages = Prisma.ProductGetPayload<{
   include: typeof productWithImages;
@@ -49,10 +50,23 @@ export type ProductRow = {
 export type SaleRow = {
   id: string;
   externalBuyerOrderId: string;
+  transactionId: string | null;
   buyer: string;
   status: string;
   itemsCount: number;
   total: string;
+  createdAt: string;
+};
+
+export type SaleDetail = SaleRow & {
+  items: {
+    id: string;
+    productId: string;
+    productName: string;
+    quantity: number;
+    unitPrice: string;
+    subtotal: string;
+  }[];
 };
 
 export type DashboardStats = {
@@ -126,10 +140,26 @@ function serializeSale(order: OrderWithItems): SaleRow {
   return {
     id: order.id,
     externalBuyerOrderId: order.external_buyer_order_id,
-    buyer: "Orden externa",
+    transactionId: order.transaction_id,
+    buyer: order.buyer_id ?? "Orden externa",
     status: order.status,
     itemsCount,
     total: formatMoney(total),
+    createdAt: order.created_at.toISOString(),
+  };
+}
+
+function serializeSaleDetail(order: OrderWithItems): SaleDetail {
+  return {
+    ...serializeSale(order),
+    items: order.items.map((item) => ({
+      id: item.id,
+      productId: item.product_id,
+      productName: item.product.name,
+      quantity: item.quantity,
+      unitPrice: formatMoney(item.price),
+      subtotal: formatMoney(Number(item.price) * item.quantity),
+    })),
   };
 }
 
@@ -154,6 +184,41 @@ function getProductsWhere(sellerId: string, query: string) {
     seller_id: sellerId,
     OR: productFilters,
   } satisfies Prisma.ProductWhereInput;
+}
+
+function getSalesWhere(sellerId: string, query: string) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return { seller_id: sellerId } satisfies Prisma.SellerOrderWhereInput;
+  }
+
+  return {
+    seller_id: sellerId,
+    OR: [
+      {
+        external_buyer_order_id: {
+          contains: trimmedQuery,
+          mode: "insensitive",
+        },
+      },
+      { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { status: { contains: trimmedQuery, mode: "insensitive" } },
+      {
+        items: {
+          some: {
+            product: {
+              name: {
+                contains: trimmedQuery,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+      },
+    ],
+  } satisfies Prisma.SellerOrderWhereInput;
 }
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
@@ -278,8 +343,50 @@ export async function fetchSales(): Promise<SaleRow[]> {
   const orders = await prisma.sellerOrder.findMany({
     where: { seller_id: sellerId },
     include: orderWithItems,
-    orderBy: { id: "desc" },
+    orderBy: { created_at: "desc" },
   });
 
   return orders.map(serializeSale);
+}
+
+export async function fetchSalesPage(
+  query: string,
+  page: number
+): Promise<SaleRow[]> {
+  const sellerId = await getAuthenticatedSellerId();
+  const currentPage = Math.max(page, 1);
+  const offset = (currentPage - 1) * SALES_PER_PAGE;
+  const where = getSalesWhere(sellerId, query);
+
+  const orders = await prisma.sellerOrder.findMany({
+    where,
+    include: orderWithItems,
+    orderBy: { created_at: "desc" },
+    skip: offset,
+    take: SALES_PER_PAGE,
+  });
+
+  return orders.map(serializeSale);
+}
+
+export async function fetchSalesPages(query: string) {
+  const sellerId = await getAuthenticatedSellerId();
+  const where = getSalesWhere(sellerId, query);
+  const count = await prisma.sellerOrder.count({ where });
+
+  return Math.ceil(count / SALES_PER_PAGE);
+}
+
+export async function fetchSaleById(saleId: string): Promise<SaleDetail | null> {
+  const sellerId = await getAuthenticatedSellerId();
+
+  const order = await prisma.sellerOrder.findFirst({
+    where: {
+      id: saleId,
+      seller_id: sellerId,
+    },
+    include: orderWithItems,
+  });
+
+  return order ? serializeSaleDetail(order) : null;
 }
