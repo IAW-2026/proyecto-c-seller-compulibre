@@ -16,8 +16,8 @@ const orderWithItems = {
   },
 } satisfies Prisma.SellerOrderInclude;
 
-const PRODUCTS_PER_PAGE = 10;
-const SALES_PER_PAGE = 10;
+const PRODUCTS_PER_PAGE = 9;
+const SALES_PER_PAGE = 9;
 
 type ProductWithImages = Prisma.ProductGetPayload<{
   include: typeof productWithImages;

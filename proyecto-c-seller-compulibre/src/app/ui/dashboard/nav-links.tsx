@@ -73,5 +73,22 @@ export function DashboardNavLinks() {
 }
 
 export function DashboardSettingsLink() {
-  return <DashboardNavLink {...settingsLink} />;
+  const pathname = usePathname();
+  const isActive = getIsActive(pathname, settingsLink.href);
+  const Icon = settingsLink.icon;
+
+  return (
+    <Link
+      href={settingsLink.href}
+      className={[
+        "inline-flex h-10 w-10 items-center justify-center rounded-lg border transition",
+        isActive
+          ? "border-primary bg-primary text-white"
+          : "border-primary/15 bg-white text-primary hover:bg-accent/35",
+      ].join(" ")}
+    >
+      <span className="sr-only">{settingsLink.name}</span>
+      <Icon className="h-5 w-5" aria-hidden="true" />
+    </Link>
+  );
 }
