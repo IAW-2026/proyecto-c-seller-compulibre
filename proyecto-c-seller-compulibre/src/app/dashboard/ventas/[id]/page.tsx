@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { TrackShipmentButton } from "@/app/dashboard/ui/track-shipment-button";
 import { fetchSaleById } from "@/lib/data";
 
 export default async function SalePage({
@@ -16,16 +17,19 @@ export default async function SalePage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <header>
-        <p className="text-sm font-semibold uppercase tracking-wide text-highlight">
-          Venta
-        </p>
-        <h1 className="mt-2 text-3xl font-bold text-primary">
-          {sale.externalBuyerOrderId}
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-          Detalle de los productos descontados del catalogo.
-        </p>
+      <header className="flex flex-col gap-4 border-b border-primary/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wide text-highlight">
+            Venta
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-primary">
+            {sale.externalBuyerOrderId}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
+            Detalle de los productos descontados del catalogo.
+          </p>
+        </div>
+        <TrackShipmentButton trackingId={sale.id} />
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">

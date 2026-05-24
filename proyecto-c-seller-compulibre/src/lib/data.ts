@@ -17,6 +17,7 @@ const orderWithItems = {
 } satisfies Prisma.SellerOrderInclude;
 
 const PRODUCTS_PER_PAGE = 10;
+const SALES_PER_PAGE = 10;
 
 type ProductWithImages = Prisma.ProductGetPayload<{
   include: typeof productWithImages;
@@ -185,6 +186,41 @@ function getProductsWhere(sellerId: string, query: string) {
   } satisfies Prisma.ProductWhereInput;
 }
 
+function getSalesWhere(sellerId: string, query: string) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return { seller_id: sellerId } satisfies Prisma.SellerOrderWhereInput;
+  }
+
+  return {
+    seller_id: sellerId,
+    OR: [
+      {
+        external_buyer_order_id: {
+          contains: trimmedQuery,
+          mode: "insensitive",
+        },
+      },
+      { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { status: { contains: trimmedQuery, mode: "insensitive" } },
+      {
+        items: {
+          some: {
+            product: {
+              name: {
+                contains: trimmedQuery,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+      },
+    ],
+  } satisfies Prisma.SellerOrderWhereInput;
+}
+
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const sellerId = await getAuthenticatedSellerId();
 
@@ -311,6 +347,34 @@ export async function fetchSales(): Promise<SaleRow[]> {
   });
 
   return orders.map(serializeSale);
+}
+
+export async function fetchSalesPage(
+  query: string,
+  page: number
+): Promise<SaleRow[]> {
+  const sellerId = await getAuthenticatedSellerId();
+  const currentPage = Math.max(page, 1);
+  const offset = (currentPage - 1) * SALES_PER_PAGE;
+  const where = getSalesWhere(sellerId, query);
+
+  const orders = await prisma.sellerOrder.findMany({
+    where,
+    include: orderWithItems,
+    orderBy: { created_at: "desc" },
+    skip: offset,
+    take: SALES_PER_PAGE,
+  });
+
+  return orders.map(serializeSale);
+}
+
+export async function fetchSalesPages(query: string) {
+  const sellerId = await getAuthenticatedSellerId();
+  const where = getSalesWhere(sellerId, query);
+  const count = await prisma.sellerOrder.count({ where });
+
+  return Math.ceil(count / SALES_PER_PAGE);
 }
 
 export async function fetchSaleById(saleId: string): Promise<SaleDetail | null> {

@@ -1,8 +1,32 @@
-import { fetchSales } from "@/lib/data";
 import Link from "next/link";
 
-export default async function SalesPage() {
-  const sales = await fetchSales();
+import { Pagination } from "@/app/dashboard/ui/pagination";
+import { Search } from "@/app/dashboard/ui/search";
+import { TrackShipmentButton } from "@/app/dashboard/ui/track-shipment-button";
+import { fetchSalesPage, fetchSalesPages } from "@/lib/data";
+
+function getCurrentPage(page?: string) {
+  const currentPage = Number(page);
+
+  if (!Number.isInteger(currentPage) || currentPage < 1) {
+    return 1;
+  }
+
+  return currentPage;
+}
+
+export default async function SalesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; query?: string }>;
+}) {
+  const params = await searchParams;
+  const currentPage = getCurrentPage(params.page);
+  const query = params.query ?? "";
+  const [sales, totalPages] = await Promise.all([
+    fetchSalesPage(query, currentPage),
+    fetchSalesPages(query),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -18,6 +42,8 @@ export default async function SalesPage() {
         </p>
       </header>
 
+      <Search placeholder="Buscar ventas..." />
+
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
         <div className="overflow-x-auto">
           {sales.length > 0 ? (
@@ -29,6 +55,9 @@ export default async function SalesPage() {
                   <th className="px-5 py-3 font-semibold">Items</th>
                   <th className="px-5 py-3 font-semibold">Total</th>
                   <th className="px-5 py-3 font-semibold">Estado</th>
+                  <th className="px-5 py-3">
+                    <span className="sr-only">Envio</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-primary/10">
@@ -54,6 +83,9 @@ export default async function SalesPage() {
                         {sale.status}
                       </span>
                     </td>
+                    <td className="px-5 py-4 text-right">
+                      <TrackShipmentButton trackingId={sale.id} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -65,6 +97,13 @@ export default async function SalesPage() {
           )}
         </div>
       </section>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        query={query}
+        basePath="/dashboard/ventas"
+      />
     </div>
   );
 }
