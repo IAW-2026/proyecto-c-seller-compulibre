@@ -1,4 +1,5 @@
 import { fetchSales } from "@/lib/data";
+import Link from "next/link";
 
 export default async function SalesPage() {
   const sales = await fetchSales();
@@ -34,7 +35,12 @@ export default async function SalesPage() {
                 {sales.map((sale) => (
                   <tr key={sale.id}>
                     <td className="px-5 py-4 font-medium text-gray-950">
-                      {sale.externalBuyerOrderId}
+                      <Link
+                        href={`/dashboard/ventas/${sale.id}`}
+                        className="transition hover:text-primary"
+                      >
+                        {sale.externalBuyerOrderId}
+                      </Link>
                     </td>
                     <td className="px-5 py-4 text-gray-600">{sale.buyer}</td>
                     <td className="px-5 py-4 text-gray-600">

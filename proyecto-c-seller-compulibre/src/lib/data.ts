@@ -49,10 +49,23 @@ export type ProductRow = {
 export type SaleRow = {
   id: string;
   externalBuyerOrderId: string;
+  transactionId: string | null;
   buyer: string;
   status: string;
   itemsCount: number;
   total: string;
+  createdAt: string;
+};
+
+export type SaleDetail = SaleRow & {
+  items: {
+    id: string;
+    productId: string;
+    productName: string;
+    quantity: number;
+    unitPrice: string;
+    subtotal: string;
+  }[];
 };
 
 export type DashboardStats = {
@@ -126,10 +139,26 @@ function serializeSale(order: OrderWithItems): SaleRow {
   return {
     id: order.id,
     externalBuyerOrderId: order.external_buyer_order_id,
+    transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
     status: order.status,
     itemsCount,
     total: formatMoney(total),
+    createdAt: order.created_at.toISOString(),
+  };
+}
+
+function serializeSaleDetail(order: OrderWithItems): SaleDetail {
+  return {
+    ...serializeSale(order),
+    items: order.items.map((item) => ({
+      id: item.id,
+      productId: item.product_id,
+      productName: item.product.name,
+      quantity: item.quantity,
+      unitPrice: formatMoney(item.price),
+      subtotal: formatMoney(Number(item.price) * item.quantity),
+    })),
   };
 }
 
@@ -282,4 +311,18 @@ export async function fetchSales(): Promise<SaleRow[]> {
   });
 
   return orders.map(serializeSale);
+}
+
+export async function fetchSaleById(saleId: string): Promise<SaleDetail | null> {
+  const sellerId = await getAuthenticatedSellerId();
+
+  const order = await prisma.sellerOrder.findFirst({
+    where: {
+      id: saleId,
+      seller_id: sellerId,
+    },
+    include: orderWithItems,
+  });
+
+  return order ? serializeSaleDetail(order) : null;
 }
