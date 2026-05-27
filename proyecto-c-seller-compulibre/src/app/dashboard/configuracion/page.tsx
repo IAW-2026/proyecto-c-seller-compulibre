@@ -16,12 +16,16 @@ export default async function SettingsPage() {
           Datos de tienda
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-          Cambia el nombre del comercio.
+          Cambia el nombre del comercio y la direccion de despacho.
         </p>
       </header>
 
       <section className="rounded-lg border border-primary/10 bg-white p-6 shadow-sm">
-        <StoreSettingsForm storeName={seller.store_name} />
+        <StoreSettingsForm
+          storeName={seller.store_name}
+          sellerAddress={seller.seller_address}
+          postalCode={seller.postal_code}
+        />
       </section>
     </div>
   );
