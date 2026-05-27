@@ -83,6 +83,8 @@ export type SaleRow = {
   externalBuyerOrderId: string;
   transactionId: string | null;
   buyer: string;
+  buyerAddress: string | null;
+  buyerPostalCode: string | null;
   status: string;
   itemsCount: number;
   total: string;
@@ -206,6 +208,8 @@ function serializeSale(order: OrderWithItems): SaleRow {
     externalBuyerOrderId: order.external_buyer_order_id,
     transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
+    buyerAddress: order.buyer_address,
+    buyerPostalCode: order.buyer_postal_code,
     status: order.status,
     itemsCount,
     total: formatMoney(total),
@@ -224,6 +228,8 @@ function serializeAdminSale(order: AdminOrderWithRelations): AdminSaleRow {
     externalBuyerOrderId: order.external_buyer_order_id,
     transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
+    buyerAddress: order.buyer_address,
+    buyerPostalCode: order.buyer_postal_code,
     status: order.status,
     itemsCount,
     total: formatMoney(total),
@@ -315,6 +321,8 @@ function getSalesWhere(sellerId: string, query: string) {
         },
       },
       { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_address: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_postal_code: { contains: trimmedQuery, mode: "insensitive" } },
       { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
       { status: { contains: trimmedQuery, mode: "insensitive" } },
       {
@@ -349,6 +357,8 @@ function getAdminSalesWhere(query: string) {
         },
       },
       { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_address: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_postal_code: { contains: trimmedQuery, mode: "insensitive" } },
       { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
       { status: { contains: trimmedQuery, mode: "insensitive" } },
       {

@@ -55,6 +55,26 @@ export default async function SalePage({
         </article>
       </section>
 
+      <section className="rounded-lg border border-primary/10 bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-primary">
+          Direccion de entrega
+        </h2>
+        <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+          <div>
+            <dt className="text-gray-500">Direccion</dt>
+            <dd className="mt-1 font-medium text-gray-950">
+              {sale.buyerAddress ?? "Sin direccion"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-gray-500">Codigo postal</dt>
+            <dd className="mt-1 font-medium text-gray-950">
+              {sale.buyerPostalCode ?? "Sin codigo postal"}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
         <div className="border-b border-primary/10 px-5 py-4">
           <h2 className="text-lg font-semibold text-primary">Items</h2>

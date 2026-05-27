@@ -56,6 +56,8 @@ model SellerOrder {
   id                       String   @id @default(cuid())
   external_buyer_order_id  String
   buyer_id                 String?
+  buyer_address            String?
+  buyer_postal_code        String?
   transaction_id           String?  @unique
   seller_id                String
   status                   String
