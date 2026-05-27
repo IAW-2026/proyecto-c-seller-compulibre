@@ -155,6 +155,15 @@ function getProductStatus(stock: number) {
   return "Publicado";
 }
 
+function formatOrderStatus(status: string) {
+  const statuses: Record<string, string> = {
+    PENDING_SHIPMENT: "Despacho Pendiente",
+    LABEL_CREATED: "Despachado",
+  };
+
+  return statuses[status] ?? status;
+}
+
 function serializeProduct(product: ProductWithImages): ProductRow {
   return {
     id: product.id,
@@ -218,7 +227,7 @@ function serializeSale(order: OrderWithItems): SaleRow {
     sellerId: order.seller_id,
     originAddress: order.seller.seller_address,
     trackingId: order.tracking_id,
-    status: order.status,
+    status: formatOrderStatus(order.status),
     itemsCount,
     total: formatMoney(total),
     createdAt: order.created_at.toISOString(),
@@ -241,7 +250,7 @@ function serializeAdminSale(order: AdminOrderWithRelations): AdminSaleRow {
     sellerId: order.seller_id,
     originAddress: order.seller.seller_address,
     trackingId: order.tracking_id,
-    status: order.status,
+    status: formatOrderStatus(order.status),
     itemsCount,
     total: formatMoney(total),
     createdAt: order.created_at.toISOString(),
