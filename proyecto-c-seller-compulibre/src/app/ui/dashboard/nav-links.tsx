@@ -4,6 +4,7 @@ import {
   Cog6ToothIcon,
   CubeIcon,
   HomeIcon,
+  KeyIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
@@ -15,6 +16,12 @@ const links = [
   { name: "Productos", href: "/dashboard/productos", icon: CubeIcon },
   { name: "Ventas", href: "/dashboard/ventas", icon: ShoppingCartIcon },
 ];
+
+const adminLink = {
+  name: "Administrador",
+  href: "/dashboard/admin",
+  icon: KeyIcon,
+};
 
 const settingsLink = {
   name: "Configuracion",
@@ -62,10 +69,12 @@ function DashboardNavLink({
   );
 }
 
-export function DashboardNavLinks() {
+export function DashboardNavLinks({ isAdmin = false }: { isAdmin?: boolean }) {
+  const visibleLinks = isAdmin ? [...links, adminLink] : links;
+
   return (
     <nav className="flex gap-2 md:mt-4 md:flex-col" aria-label="Dashboard">
-      {links.map((link) => (
+      {visibleLinks.map((link) => (
         <DashboardNavLink key={link.name} {...link} />
       ))}
     </nav>

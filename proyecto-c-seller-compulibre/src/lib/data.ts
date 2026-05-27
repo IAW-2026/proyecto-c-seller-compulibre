@@ -1,14 +1,37 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { Prisma, ProductCategory } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 import { prisma } from "./prisma";
+import { isAdminUser } from "./auth";
 
 const productWithImages = {
   images: true,
 } satisfies Prisma.ProductInclude;
 
 const orderWithItems = {
+  items: {
+    include: {
+      product: true,
+    },
+  },
+} satisfies Prisma.SellerOrderInclude;
+
+const adminProductWithRelations = {
+  images: true,
+  seller: {
+    select: {
+      store_name: true,
+    },
+  },
+} satisfies Prisma.ProductInclude;
+
+const adminOrderWithRelations = {
+  seller: {
+    select: {
+      store_name: true,
+    },
+  },
   items: {
     include: {
       product: true,
@@ -25,6 +48,14 @@ type ProductWithImages = Prisma.ProductGetPayload<{
 
 type OrderWithItems = Prisma.SellerOrderGetPayload<{
   include: typeof orderWithItems;
+}>;
+
+type AdminProductWithRelations = Prisma.ProductGetPayload<{
+  include: typeof adminProductWithRelations;
+}>;
+
+type AdminOrderWithRelations = Prisma.SellerOrderGetPayload<{
+  include: typeof adminOrderWithRelations;
 }>;
 
 export type ProductRow = {
@@ -56,6 +87,14 @@ export type SaleRow = {
   itemsCount: number;
   total: string;
   createdAt: string;
+};
+
+export type AdminProductRow = ProductRow & {
+  sellerName: string;
+};
+
+export type AdminSaleRow = SaleRow & {
+  sellerName: string;
 };
 
 export type SaleDetail = SaleRow & {
@@ -131,6 +170,31 @@ function serializeProduct(product: ProductWithImages): ProductRow {
   };
 }
 
+function serializeAdminProduct(
+  product: AdminProductWithRelations
+): AdminProductRow {
+  return {
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    category: product.category,
+    price: formatMoney(product.price),
+    priceValue: product.price.toString(),
+    brand: product.brand,
+    stock: product.stock,
+    condition: product.condition,
+    status: getProductStatus(product.stock),
+    imageUrl: product.images[0]?.image_url ?? null,
+    images: product.images.map((image) => ({
+      id: image.id,
+      imageUrl: image.image_url,
+    })),
+    createdAt: product.created_at.toISOString(),
+    updatedAt: product.updated_at.toISOString(),
+    sellerName: product.seller.store_name,
+  };
+}
+
 function serializeSale(order: OrderWithItems): SaleRow {
   const total = order.items.reduce((sum, item) => {
     return sum + Number(item.price) * item.quantity;
@@ -146,6 +210,25 @@ function serializeSale(order: OrderWithItems): SaleRow {
     itemsCount,
     total: formatMoney(total),
     createdAt: order.created_at.toISOString(),
+  };
+}
+
+function serializeAdminSale(order: AdminOrderWithRelations): AdminSaleRow {
+  const total = order.items.reduce((sum, item) => {
+    return sum + Number(item.price) * item.quantity;
+  }, 0);
+  const itemsCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+  return {
+    id: order.id,
+    externalBuyerOrderId: order.external_buyer_order_id,
+    transactionId: order.transaction_id,
+    buyer: order.buyer_id ?? "Orden externa",
+    status: order.status,
+    itemsCount,
+    total: formatMoney(total),
+    createdAt: order.created_at.toISOString(),
+    sellerName: order.seller.store_name,
   };
 }
 
@@ -186,6 +269,35 @@ function getProductsWhere(sellerId: string, query: string) {
   } satisfies Prisma.ProductWhereInput;
 }
 
+function getAdminProductsWhere(query: string) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return {} satisfies Prisma.ProductWhereInput;
+  }
+
+  const productFilters: Prisma.ProductWhereInput[] = [
+    { name: { contains: trimmedQuery, mode: "insensitive" } },
+    { brand: { contains: trimmedQuery, mode: "insensitive" } },
+    {
+      seller: {
+        store_name: { contains: trimmedQuery, mode: "insensitive" },
+      },
+    },
+  ];
+  const categoryQuery = trimmedQuery.toUpperCase();
+
+  if (Object.values(ProductCategory).includes(categoryQuery as ProductCategory)) {
+    productFilters.push({
+      category: { equals: categoryQuery as ProductCategory },
+    });
+  }
+
+  return {
+    OR: productFilters,
+  } satisfies Prisma.ProductWhereInput;
+}
+
 function getSalesWhere(sellerId: string, query: string) {
   const trimmedQuery = query.trim();
 
@@ -205,6 +317,45 @@ function getSalesWhere(sellerId: string, query: string) {
       { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
       { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
       { status: { contains: trimmedQuery, mode: "insensitive" } },
+      {
+        items: {
+          some: {
+            product: {
+              name: {
+                contains: trimmedQuery,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+      },
+    ],
+  } satisfies Prisma.SellerOrderWhereInput;
+}
+
+function getAdminSalesWhere(query: string) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return {} satisfies Prisma.SellerOrderWhereInput;
+  }
+
+  return {
+    OR: [
+      {
+        external_buyer_order_id: {
+          contains: trimmedQuery,
+          mode: "insensitive",
+        },
+      },
+      { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { status: { contains: trimmedQuery, mode: "insensitive" } },
+      {
+        seller: {
+          store_name: { contains: trimmedQuery, mode: "insensitive" },
+        },
+      },
       {
         items: {
           some: {
@@ -325,12 +476,16 @@ export async function fetchProductById(
   productId: string
 ): Promise<ProductRow | null> {
   const sellerId = await getAuthenticatedSellerId();
+  const user = await currentUser();
+  const where = isAdminUser(user)
+    ? { id: productId }
+    : {
+        id: productId,
+        seller_id: sellerId,
+      };
 
   const product = await prisma.product.findFirst({
-    where: {
-      id: productId,
-      seller_id: sellerId,
-    },
+    where,
     include: productWithImages,
   });
 
@@ -379,14 +534,70 @@ export async function fetchSalesPages(query: string) {
 
 export async function fetchSaleById(saleId: string): Promise<SaleDetail | null> {
   const sellerId = await getAuthenticatedSellerId();
+  const user = await currentUser();
+  const where = isAdminUser(user)
+    ? { id: saleId }
+    : {
+        id: saleId,
+        seller_id: sellerId,
+      };
 
   const order = await prisma.sellerOrder.findFirst({
-    where: {
-      id: saleId,
-      seller_id: sellerId,
-    },
+    where,
     include: orderWithItems,
   });
 
   return order ? serializeSaleDetail(order) : null;
+}
+
+export async function fetchAdminProductsPage(
+  query: string,
+  page: number
+): Promise<AdminProductRow[]> {
+  const currentPage = Math.max(page, 1);
+  const offset = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const where = getAdminProductsWhere(query);
+
+  const products = await prisma.product.findMany({
+    where,
+    include: adminProductWithRelations,
+    orderBy: { created_at: "desc" },
+    skip: offset,
+    take: PRODUCTS_PER_PAGE,
+  });
+
+  return products.map(serializeAdminProduct);
+}
+
+export async function fetchAdminProductsPages(query: string) {
+  const where = getAdminProductsWhere(query);
+  const count = await prisma.product.count({ where });
+
+  return Math.ceil(count / PRODUCTS_PER_PAGE);
+}
+
+export async function fetchAdminSalesPage(
+  query: string,
+  page: number
+): Promise<AdminSaleRow[]> {
+  const currentPage = Math.max(page, 1);
+  const offset = (currentPage - 1) * SALES_PER_PAGE;
+  const where = getAdminSalesWhere(query);
+
+  const orders = await prisma.sellerOrder.findMany({
+    where,
+    include: adminOrderWithRelations,
+    orderBy: { created_at: "desc" },
+    skip: offset,
+    take: SALES_PER_PAGE,
+  });
+
+  return orders.map(serializeAdminSale);
+}
+
+export async function fetchAdminSalesPages(query: string) {
+  const where = getAdminSalesWhere(query);
+  const count = await prisma.sellerOrder.count({ where });
+
+  return Math.ceil(count / SALES_PER_PAGE);
 }

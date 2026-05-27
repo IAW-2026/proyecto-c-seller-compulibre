@@ -6,9 +6,15 @@ import { ProductCategory, ProductCondition } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireDashboardUser } from "./auth";
+import { isAdminUser, requireDashboardUser } from "./auth";
 import { uploadProductImagesToCloudinary } from "./cloudinary";
-import { createProduct, deleteProduct, updateProduct } from "./products";
+import {
+  createProduct,
+  deleteProduct,
+  deleteProductById,
+  updateProduct,
+  updateProductById,
+} from "./products";
 import { ensureSellerProfile } from "./sellers";
 
 function readRequiredString(formData: FormData, field: string) {
@@ -149,13 +155,14 @@ export async function updateProductFromForm(
 ) {
   const user = await requireDashboardUser();
   const seller = await ensureSellerProfile(user);
+  const isAdmin = isAdminUser(user);
   const imageFiles = readImageFiles(formData);
   const imageUrls =
     imageFiles.length > 0
       ? await uploadProductImagesToCloudinary(imageFiles, seller.clerk_user_id)
       : undefined;
 
-  await updateProduct(productId, seller.clerk_user_id, {
+  const input = {
     name: readRequiredString(formData, "name"),
     description: readOptionalString(formData, "description"),
     category: readCategory(formData),
@@ -164,21 +171,37 @@ export async function updateProductFromForm(
     stock: readRequiredInteger(formData, "stock"),
     condition: readCondition(formData),
     imageUrls,
-  });
+  };
+
+  if (isAdmin) {
+    await updateProductById(productId, input);
+  } else {
+    await updateProduct(productId, seller.clerk_user_id, input);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/productos");
+  revalidatePath("/dashboard/admin");
   revalidatePath(`/dashboard/productos/${productId}`);
   redirect(`/dashboard/productos/${productId}`);
 }
 
-export async function deleteProductFromForm(productId: string) {
+export async function deleteProductFromForm(
+  productId: string,
+  redirectPath = "/dashboard/productos"
+) {
   const user = await requireDashboardUser();
   const seller = await ensureSellerProfile(user);
+  const isAdmin = isAdminUser(user);
 
-  await deleteProduct(productId, seller.clerk_user_id);
+  if (isAdmin) {
+    await deleteProductById(productId);
+  } else {
+    await deleteProduct(productId, seller.clerk_user_id);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/productos");
-  redirect("/dashboard/productos");
+  revalidatePath("/dashboard/admin");
+  redirect(redirectPath);
 }

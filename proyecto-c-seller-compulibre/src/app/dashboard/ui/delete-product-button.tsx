@@ -2,8 +2,18 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 
 import { deleteProductFromForm } from "@/lib/product-actions";
 
-export function DeleteProductButton({ productId }: { productId: string }) {
-  const deleteProductWithId = deleteProductFromForm.bind(null, productId);
+export function DeleteProductButton({
+  productId,
+  redirectPath = "/dashboard/productos",
+}: {
+  productId: string;
+  redirectPath?: string;
+}) {
+  const deleteProductWithId = deleteProductFromForm.bind(
+    null,
+    productId,
+    redirectPath
+  );
 
   return (
     <form action={deleteProductWithId}>

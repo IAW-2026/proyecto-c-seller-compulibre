@@ -4,7 +4,17 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
-export function Search({ placeholder }: { placeholder: string }) {
+export function Search({
+  placeholder,
+  queryParam = "query",
+  pageParam = "page",
+  inputId = "search",
+}: {
+  placeholder: string;
+  queryParam?: string;
+  pageParam?: string;
+  inputId?: string;
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -12,12 +22,12 @@ export function Search({ placeholder }: { placeholder: string }) {
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
 
-    params.set("page", "1");
+    params.set(pageParam, "1");
 
     if (term) {
-      params.set("query", term);
+      params.set(queryParam, term);
     } else {
-      params.delete("query");
+      params.delete(queryParam);
     }
 
     replace(`${pathname}?${params.toString()}`);
@@ -25,14 +35,14 @@ export function Search({ placeholder }: { placeholder: string }) {
 
   return (
     <div className="relative flex flex-1">
-      <label htmlFor="search-products" className="sr-only">
+      <label htmlFor={inputId} className="sr-only">
         Buscar
       </label>
       <input
-        id="search-products"
+        id={inputId}
         type="search"
         placeholder={placeholder}
-        defaultValue={searchParams.get("query")?.toString()}
+        defaultValue={searchParams.get(queryParam)?.toString()}
         onChange={(event) => handleSearch(event.target.value)}
         className="w-full rounded-lg border border-primary/20 bg-white py-2 pl-10 pr-3 text-sm text-gray-950 outline-none transition placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
       />

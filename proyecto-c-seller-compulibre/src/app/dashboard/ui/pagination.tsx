@@ -20,12 +20,33 @@ function generatePagination(currentPage: number, totalPages: number) {
   return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
 }
 
-function createPageUrl(page: number, query: string, basePath: string) {
+function createPageUrl({
+  page,
+  query,
+  basePath,
+  pageParam,
+  queryParam,
+  extraParams = {},
+}: {
+  page: number;
+  query: string;
+  basePath: string;
+  pageParam: string;
+  queryParam: string;
+  extraParams?: Record<string, string | undefined>;
+}) {
   const params = new URLSearchParams();
-  params.set("page", page.toString());
+
+  Object.entries(extraParams).forEach(([key, value]) => {
+    if (value) {
+      params.set(key, value);
+    }
+  });
+
+  params.set(pageParam, page.toString());
 
   if (query) {
-    params.set("query", query);
+    params.set(queryParam, query);
   }
 
   return `${basePath}?${params.toString()}`;
@@ -65,11 +86,17 @@ export function Pagination({
   totalPages,
   query = "",
   basePath = "/dashboard/productos",
+  pageParam = "page",
+  queryParam = "query",
+  extraParams = {},
 }: {
   currentPage: number;
   totalPages: number;
   query?: string;
   basePath?: string;
+  pageParam?: string;
+  queryParam?: string;
+  extraParams?: Record<string, string | undefined>;
 }) {
   if (totalPages <= 1) {
     return null;
@@ -81,7 +108,14 @@ export function Pagination({
     <div className="flex items-center justify-center gap-2">
       <PaginationArrow
         direction="left"
-        href={createPageUrl(currentPage - 1, query, basePath)}
+        href={createPageUrl({
+          page: currentPage - 1,
+          query,
+          basePath,
+          pageParam,
+          queryParam,
+          extraParams,
+        })}
         isDisabled={currentPage <= 1}
       />
 
@@ -104,7 +138,14 @@ export function Pagination({
           return (
             <Link
               key={pageNumber}
-              href={createPageUrl(pageNumber, query, basePath)}
+              href={createPageUrl({
+                page: pageNumber,
+                query,
+                basePath,
+                pageParam,
+                queryParam,
+                extraParams,
+              })}
               className={[
                 "inline-flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition",
                 isActive
@@ -120,7 +161,14 @@ export function Pagination({
 
       <PaginationArrow
         direction="right"
-        href={createPageUrl(currentPage + 1, query, basePath)}
+        href={createPageUrl({
+          page: currentPage + 1,
+          query,
+          basePath,
+          pageParam,
+          queryParam,
+          extraParams,
+        })}
         isDisabled={currentPage >= totalPages}
       />
     </div>

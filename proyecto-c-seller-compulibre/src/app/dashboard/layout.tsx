@@ -1,7 +1,7 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
-import { requireDashboardUser } from "@/lib/auth";
+import { isAdminUser, requireDashboardUser } from "@/lib/auth";
 import { ensureSellerProfile } from "@/lib/sellers";
 
 import {
@@ -18,6 +18,7 @@ export default async function DashboardLayout({
   const seller = await ensureSellerProfile(user);
   const displayName = seller.store_name;
   const email = seller.contact_email;
+  const isAdmin = isAdminUser(user);
 
   return (
     <div className="min-h-screen bg-secondary text-gray-950 md:flex">
@@ -37,7 +38,7 @@ export default async function DashboardLayout({
             </div>
           </Link>
 
-          <DashboardNavLinks />
+          <DashboardNavLinks isAdmin={isAdmin} />
         </div>
       </aside>
 
