@@ -58,6 +58,7 @@ model SellerOrder {
   buyer_id                 String?
   buyer_address            String?
   buyer_postal_code        String?
+  tracking_id              String?
   transaction_id           String?  @unique
   seller_id                String
   status                   String

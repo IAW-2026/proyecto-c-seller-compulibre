@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 import { TrackShipmentButton } from "@/app/dashboard/ui/track-shipment-button";
 import { fetchSaleById } from "@/lib/data";
@@ -29,7 +30,25 @@ export default async function SalePage({
             Detalle de los productos descontados del catalogo.
           </p>
         </div>
-        <TrackShipmentButton trackingId={sale.id} />
+        <div className="flex flex-col gap-2 sm:items-end">
+          {sale.trackingId ? (
+            <button
+              type="button"
+              disabled
+              className="inline-flex cursor-not-allowed items-center justify-center rounded-lg bg-secondary px-3 py-2 text-sm font-semibold text-gray-500"
+            >
+              Despacho registrado
+            </button>
+          ) : (
+            <Link
+              href={`/dashboard/ventas/${sale.id}/despachar`}
+              className="inline-flex items-center justify-center rounded-lg bg-highlight px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
+            >
+              Registrar despacho
+            </Link>
+          )}
+          <TrackShipmentButton trackingId={sale.trackingId} />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">

@@ -84,7 +84,7 @@ export default async function SalesPage({
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <TrackShipmentButton trackingId={sale.id} />
+                      <TrackShipmentButton trackingId={sale.trackingId} />
                     </td>
                   </tr>
                 ))}

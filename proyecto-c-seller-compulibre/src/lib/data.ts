@@ -10,6 +10,7 @@ const productWithImages = {
 } satisfies Prisma.ProductInclude;
 
 const orderWithItems = {
+  seller: true,
   items: {
     include: {
       product: true,
@@ -30,6 +31,7 @@ const adminOrderWithRelations = {
   seller: {
     select: {
       store_name: true,
+      seller_address: true,
     },
   },
   items: {
@@ -85,6 +87,9 @@ export type SaleRow = {
   buyer: string;
   buyerAddress: string | null;
   buyerPostalCode: string | null;
+  sellerId: string;
+  originAddress: string | null;
+  trackingId: string | null;
   status: string;
   itemsCount: number;
   total: string;
@@ -210,6 +215,9 @@ function serializeSale(order: OrderWithItems): SaleRow {
     buyer: order.buyer_id ?? "Orden externa",
     buyerAddress: order.buyer_address,
     buyerPostalCode: order.buyer_postal_code,
+    sellerId: order.seller_id,
+    originAddress: order.seller.seller_address,
+    trackingId: order.tracking_id,
     status: order.status,
     itemsCount,
     total: formatMoney(total),
@@ -230,6 +238,9 @@ function serializeAdminSale(order: AdminOrderWithRelations): AdminSaleRow {
     buyer: order.buyer_id ?? "Orden externa",
     buyerAddress: order.buyer_address,
     buyerPostalCode: order.buyer_postal_code,
+    sellerId: order.seller_id,
+    originAddress: order.seller.seller_address,
+    trackingId: order.tracking_id,
     status: order.status,
     itemsCount,
     total: formatMoney(total),
