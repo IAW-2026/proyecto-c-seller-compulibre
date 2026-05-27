@@ -20,3 +20,17 @@ export async function requireDashboardUser() {
 
   return user;
 }
+
+export function isAdminUser(user: Awaited<ReturnType<typeof currentUser>>) {
+  return user?.publicMetadata?.role === "admin";
+}
+
+export async function requireAdminUser() {
+  const user = await requireDashboardUser();
+
+  if (!isAdminUser(user)) {
+    redirect("/dashboard");
+  }
+
+  return user;
+}

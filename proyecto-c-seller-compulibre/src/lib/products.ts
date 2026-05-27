@@ -189,6 +189,56 @@ export async function updateProduct(
   return serializeProduct(product)
 }
 
+export async function updateProductById(
+  productId: string,
+  input: UpdateProductInput
+): Promise<Product> {
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { id: true },
+  })
+
+  if (!existingProduct) {
+    throw new Error('Producto no encontrado')
+  }
+
+  const imageUrls =
+    input.imageUrls === undefined ? undefined : cleanImageUrls(input.imageUrls)
+
+  const product = await prisma.$transaction(async (tx) => {
+    if (imageUrls !== undefined) {
+      await tx.productImage.deleteMany({
+        where: { product_id: productId },
+      })
+    }
+
+    return tx.product.update({
+      where: { id: productId },
+      data: {
+        name: input.name,
+        description: input.description,
+        category: input.category,
+        price:
+          input.price === undefined ? undefined : toProductPrice(input.price),
+        brand: input.brand,
+        stock: input.stock,
+        condition: input.condition,
+        images:
+          imageUrls === undefined || imageUrls.length === 0
+            ? undefined
+            : {
+                create: imageUrls.map((imageUrl) => ({
+                  image_url: imageUrl,
+                })),
+              },
+      },
+      include: productWithImages,
+    })
+  })
+
+  return serializeProduct(product)
+}
+
 export async function deleteProduct(
   productId: string,
   sellerId: string
@@ -203,6 +253,24 @@ export async function deleteProduct(
 
   if (!existingProduct) {
     throw new Error('Producto no encontrado para este vendedor')
+  }
+
+  const product = await prisma.product.delete({
+    where: { id: productId },
+    include: productWithImages,
+  })
+
+  return serializeProduct(product)
+}
+
+export async function deleteProductById(productId: string): Promise<Product> {
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { id: true },
+  })
+
+  if (!existingProduct) {
+    throw new Error('Producto no encontrado')
   }
 
   const product = await prisma.product.delete({

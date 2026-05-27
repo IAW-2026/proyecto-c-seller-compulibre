@@ -1,7 +1,7 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
-import { requireDashboardUser } from "@/lib/auth";
+import { isAdminUser, requireDashboardUser } from "@/lib/auth";
 import { ensureSellerProfile } from "@/lib/sellers";
 
 import {
@@ -18,6 +18,7 @@ export default async function DashboardLayout({
   const seller = await ensureSellerProfile(user);
   const displayName = seller.store_name;
   const email = seller.contact_email;
+  const isAdmin = isAdminUser(user);
 
   return (
     <div className="min-h-screen bg-secondary text-gray-950 md:flex">
@@ -37,37 +38,32 @@ export default async function DashboardLayout({
             </div>
           </Link>
 
-          <DashboardNavLinks />
-
-          <div className="md:hidden">
-            <DashboardSettingsLink />
-          </div>
-        </div>
-
-        <div className="hidden border-t border-primary/10 p-6 md:mt-auto md:flex md:flex-col md:gap-4">
-          <DashboardSettingsLink />
-
-          <div className="flex items-center gap-3">
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "h-10 w-10",
-                },
-              }}
-            />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-gray-900">
-                {displayName || "Vendedor"}
-              </p>
-              {email ? (
-                <p className="truncate text-xs text-gray-500">{email}</p>
-              ) : null}
-            </div>
-          </div>
+          <DashboardNavLinks isAdmin={isAdmin} />
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
+      <div className="min-w-0 flex-1">
+        <header className="sticky top-0 z-20 flex items-center justify-end gap-3 border-b border-primary/10 bg-white px-4 py-3 md:px-8">
+          <DashboardSettingsLink />
+          <div className="min-w-0 text-right">
+            <p className="truncate text-sm font-semibold text-gray-900">
+              {displayName || "Vendedor"}
+            </p>
+            {email ? (
+              <p className="truncate text-xs text-gray-500">{email}</p>
+            ) : null}
+          </div>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "h-10 w-10",
+              },
+            }}
+          />
+        </header>
+
+        <main className="p-4 md:p-8">{children}</main>
+      </div>
     </div>
   );
 }

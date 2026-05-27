@@ -4,6 +4,7 @@ import {
   Cog6ToothIcon,
   CubeIcon,
   HomeIcon,
+  KeyIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
@@ -15,6 +16,12 @@ const links = [
   { name: "Productos", href: "/dashboard/productos", icon: CubeIcon },
   { name: "Ventas", href: "/dashboard/ventas", icon: ShoppingCartIcon },
 ];
+
+const adminLink = {
+  name: "Administrador",
+  href: "/dashboard/admin",
+  icon: KeyIcon,
+};
 
 const settingsLink = {
   name: "Configuracion",
@@ -62,10 +69,12 @@ function DashboardNavLink({
   );
 }
 
-export function DashboardNavLinks() {
+export function DashboardNavLinks({ isAdmin = false }: { isAdmin?: boolean }) {
+  const visibleLinks = isAdmin ? [...links, adminLink] : links;
+
   return (
     <nav className="flex gap-2 md:mt-4 md:flex-col" aria-label="Dashboard">
-      {links.map((link) => (
+      {visibleLinks.map((link) => (
         <DashboardNavLink key={link.name} {...link} />
       ))}
     </nav>
@@ -73,5 +82,22 @@ export function DashboardNavLinks() {
 }
 
 export function DashboardSettingsLink() {
-  return <DashboardNavLink {...settingsLink} />;
+  const pathname = usePathname();
+  const isActive = getIsActive(pathname, settingsLink.href);
+  const Icon = settingsLink.icon;
+
+  return (
+    <Link
+      href={settingsLink.href}
+      className={[
+        "inline-flex h-10 w-10 items-center justify-center rounded-lg border transition",
+        isActive
+          ? "border-primary bg-primary text-white"
+          : "border-primary/15 bg-white text-primary hover:bg-accent/35",
+      ].join(" ")}
+    >
+      <span className="sr-only">{settingsLink.name}</span>
+      <Icon className="h-5 w-5" aria-hidden="true" />
+    </Link>
+  );
 }
