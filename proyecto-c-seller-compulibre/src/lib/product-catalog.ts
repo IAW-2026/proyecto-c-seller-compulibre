@@ -276,7 +276,7 @@ export async function getCatalogProductById(productId: string) {
     return null;
   }
 
-  const catalogProduct = serializeCatalogProduct(product);
+  const { image: _image, ...catalogProduct } = serializeCatalogProduct(product);
 
   return {
     ...catalogProduct,
