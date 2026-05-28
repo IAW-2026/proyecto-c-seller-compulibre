@@ -231,6 +231,15 @@ export async function confirmCatalogOrder(
       },
     });
 
+    await tx.notification.create({
+      data: {
+        seller_id: sellerId,
+        title: "Nueva venta",
+        message: `Recibiste una nueva venta: ${input.orderReference}`,
+        href: `/dashboard/ventas/${sellerOrder.id}`,
+      },
+    });
+
     return {
       sellerOrderId: sellerOrder.id,
       status: sellerOrder.status,

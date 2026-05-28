@@ -18,6 +18,7 @@ model SellerProfile {
 
   products       Product[]
   orders         SellerOrder[]
+  notifications  Notification[]
 }
 
 model Product {
@@ -81,6 +82,20 @@ model SellerOrderItem {
 
   product     Product     @relation(fields: [product_id], references: [id])
   order       SellerOrder @relation(fields: [seller_order_id], references: [id])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  seller_id  String
+  title      String
+  message    String
+  href       String?
+  created_at DateTime @default(now())
+
+  seller     SellerProfile @relation(fields: [seller_id], references: [clerk_user_id], onDelete: Cascade)
+
+  @@index([seller_id])
+  @@index([created_at])
 }
 
 enum ProductCondition {
