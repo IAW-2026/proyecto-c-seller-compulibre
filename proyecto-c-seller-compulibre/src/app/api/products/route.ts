@@ -6,8 +6,21 @@ export async function GET(request: Request) {
     return Response.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const products = await getCatalogProducts();
-  return Response.json(products);
+  const { searchParams } = new URL(request.url);
+  const catalog = await getCatalogProducts({
+    query: searchParams.get("query"),
+    category: searchParams.get("category"),
+    condition: searchParams.get("condition"),
+    minPrice: searchParams.get("minPrice"),
+    maxPrice: searchParams.get("maxPrice"),
+    sort: searchParams.get("sort"),
+    ascendingPrice: searchParams.get("ascendingPrice"),
+    descendingPrice: searchParams.get("descendingPrice"),
+    page: searchParams.get("page"),
+    limit: searchParams.get("limit"),
+  });
+
+  return Response.json(catalog);
 }
 
 export async function POST() {
