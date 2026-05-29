@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 import {
-  createMockNotification,
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from "@/lib/notification-actions";
@@ -22,7 +21,6 @@ export function NotificationBell({
   const [isOpen, setIsOpen] = useState(false);
   const unreadCount = notifications.length;
   const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
-  const showMockButton = process.env.NODE_ENV !== "production";
 
   return (
     <div className="relative">
@@ -35,7 +33,7 @@ export function NotificationBell({
       >
         <BellIcon className="h-5 w-5" aria-hidden="true" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] font-bold leading-none text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-highlight px-1 text-[11px] font-bold leading-none text-white">
             {badgeLabel}
           </span>
         ) : null}
@@ -93,17 +91,6 @@ export function NotificationBell({
                 className="w-full border-t border-primary/10 px-4 py-3 text-center text-sm font-semibold text-primary transition hover:bg-secondary/70"
               >
                 Marcar todo como leido
-              </button>
-            </form>
-          ) : null}
-
-          {showMockButton ? (
-            <form action={createMockNotification}>
-              <button
-                type="submit"
-                className="w-full border-t border-primary/10 px-4 py-3 text-center text-sm font-semibold text-highlight transition hover:bg-accent/20"
-              >
-                Crear notificacion mock
               </button>
             </form>
           ) : null}
