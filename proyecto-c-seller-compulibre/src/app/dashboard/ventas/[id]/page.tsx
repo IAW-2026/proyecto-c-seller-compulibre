@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 import { TrackShipmentButton } from "@/app/dashboard/ui/track-shipment-button";
 import { fetchSaleById } from "@/lib/data";
@@ -29,7 +30,25 @@ export default async function SalePage({
             Detalle de los productos descontados del catalogo.
           </p>
         </div>
-        <TrackShipmentButton trackingId={sale.id} />
+        <div className="flex flex-col gap-2 sm:items-end">
+          {sale.trackingId ? (
+            <button
+              type="button"
+              disabled
+              className="inline-flex cursor-not-allowed items-center justify-center rounded-lg bg-secondary px-3 py-2 text-sm font-semibold text-gray-500"
+            >
+              Despacho registrado
+            </button>
+          ) : (
+            <Link
+              href={`/dashboard/ventas/${sale.id}/despachar`}
+              className="inline-flex items-center justify-center rounded-lg bg-highlight px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
+            >
+              Registrar despacho
+            </Link>
+          )}
+          <TrackShipmentButton trackingId={sale.trackingId} />
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -53,6 +72,26 @@ export default async function SalePage({
             {sale.total}
           </p>
         </article>
+      </section>
+
+      <section className="rounded-lg border border-primary/10 bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-primary">
+          Direccion de entrega
+        </h2>
+        <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+          <div>
+            <dt className="text-gray-500">Direccion</dt>
+            <dd className="mt-1 font-medium text-gray-950">
+              {sale.buyerAddress ?? "Sin direccion"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-gray-500">Codigo postal</dt>
+            <dd className="mt-1 font-medium text-gray-950">
+              {sale.buyerPostalCode ?? "Sin codigo postal"}
+            </dd>
+          </div>
+        </dl>
       </section>
 
       <section className="rounded-lg border border-primary/10 bg-white shadow-sm">

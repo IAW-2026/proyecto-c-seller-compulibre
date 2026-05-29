@@ -7,6 +7,8 @@ const PENDING_SHIPMENT = "PENDING_SHIPMENT";
 export type ConfirmOrderInput = {
   orderReference: string;
   buyerId: string;
+  buyerAddress: string;
+  buyerPostalCode: string;
   transactionId: string;
   items: {
     productId: string;
@@ -48,24 +50,30 @@ function normalizeItems(items: ConfirmOrderInput["items"]) {
   );
 }
 
+function readRequiredString(
+  body: Record<string, unknown>,
+  field: string,
+  label = field
+) {
+  const value = body[field];
+
+  if (typeof value !== "string" || !value.trim()) {
+    throw new OrderConfirmationError(`${label} es obligatorio`);
+  }
+
+  return value.trim();
+}
+
 export function parseConfirmOrderPayload(payload: unknown): ConfirmOrderInput {
   if (!payload || typeof payload !== "object") {
     throw new OrderConfirmationError("El body debe ser un objeto JSON");
   }
 
   const body = payload as Record<string, unknown>;
-
-  if (typeof body.orderReference !== "string" || !body.orderReference.trim()) {
-    throw new OrderConfirmationError("orderReference es obligatorio");
-  }
-
-  if (typeof body.buyerId !== "string" || !body.buyerId.trim()) {
-    throw new OrderConfirmationError("buyerId es obligatorio");
-  }
-
-  if (typeof body.transactionId !== "string" || !body.transactionId.trim()) {
-    throw new OrderConfirmationError("transactionId es obligatorio");
-  }
+  const buyerPostalCode =
+    typeof body.buyerPostalCode === "string"
+      ? body.buyerPostalCode
+      : body.buyerCodigoPostal;
 
   if (!Array.isArray(body.items) || body.items.length === 0) {
     throw new OrderConfirmationError("items debe tener al menos un producto");
@@ -99,9 +107,14 @@ export function parseConfirmOrderPayload(payload: unknown): ConfirmOrderInput {
   });
 
   return {
-    orderReference: body.orderReference.trim(),
-    buyerId: body.buyerId.trim(),
-    transactionId: body.transactionId.trim(),
+    orderReference: readRequiredString(body, "orderReference"),
+    buyerId: readRequiredString(body, "buyerId"),
+    buyerAddress: readRequiredString(body, "buyerAddress"),
+    buyerPostalCode: readRequiredString(
+      { buyerPostalCode },
+      "buyerPostalCode"
+    ),
+    transactionId: readRequiredString(body, "transactionId"),
     items: normalizeItems(items),
   };
 }
@@ -191,6 +204,8 @@ export async function confirmCatalogOrder(
       data: {
         external_buyer_order_id: input.orderReference,
         buyer_id: input.buyerId,
+        buyer_address: input.buyerAddress,
+        buyer_postal_code: input.buyerPostalCode,
         transaction_id: input.transactionId,
         seller_id: sellerId,
         status: PENDING_SHIPMENT,
@@ -213,6 +228,15 @@ export async function confirmCatalogOrder(
       select: {
         id: true,
         status: true,
+      },
+    });
+
+    await tx.notification.create({
+      data: {
+        seller_id: sellerId,
+        title: "Nueva venta",
+        message: `Recibiste una nueva venta: ${input.orderReference}`,
+        href: `/dashboard/ventas/${sellerOrder.id}`,
       },
     });
 

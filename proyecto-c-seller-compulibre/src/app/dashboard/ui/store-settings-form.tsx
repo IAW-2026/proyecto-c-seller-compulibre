@@ -3,18 +3,49 @@
 import { useActionState } from "react";
 
 import {
-  updateSellerStoreName,
-  type UpdateStoreNameState,
+  ARGENTINA_PROVINCES,
+  getArgentinaProvince,
+} from "@/lib/argentina-provinces";
+import {
+  updateSellerSettings,
+  type UpdateStoreSettingsState,
 } from "@/lib/seller-actions";
 
-const initialState: UpdateStoreNameState = {
+const initialState: UpdateStoreSettingsState = {
   status: "idle",
   message: "",
 };
 
-export function StoreSettingsForm({ storeName }: { storeName: string }) {
+function parseSellerAddress(sellerAddress?: string | null) {
+  if (!sellerAddress) {
+    return {
+      province: "",
+      city: "",
+    };
+  }
+
+  const [province, ...cityParts] = sellerAddress.split(",");
+
+  return {
+    province: getArgentinaProvince(province) ?? "",
+    city: cityParts.join(",").trim(),
+  };
+}
+
+type StoreSettingsFormProps = {
+  storeName: string;
+  sellerAddress?: string | null;
+  postalCode?: string | null;
+};
+
+export function StoreSettingsForm({
+  storeName,
+  sellerAddress,
+  postalCode,
+}: StoreSettingsFormProps) {
+  const address = parseSellerAddress(sellerAddress);
   const [state, formAction, pending] = useActionState(
-    updateSellerStoreName,
+    updateSellerSettings,
     initialState
   );
 
@@ -31,6 +62,58 @@ export function StoreSettingsForm({ storeName }: { storeName: string }) {
           minLength={2}
           maxLength={80}
           defaultValue={storeName}
+          className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+        />
+      </label>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-gray-900">
+            Provincia
+          </span>
+          <select
+            name="province"
+            required
+            defaultValue={address.province}
+            className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+          >
+            <option value="" disabled>
+              Seleccionar provincia
+            </option>
+            {ARGENTINA_PROVINCES.map((province) => (
+              <option key={province} value={province}>
+                {province}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-gray-900">Ciudad</span>
+          <input
+            name="city"
+            type="text"
+            required
+            minLength={2}
+            maxLength={80}
+            defaultValue={address.city}
+            placeholder="Ingresar ciudad"
+            className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+          />
+        </label>
+      </div>
+
+      <label className="flex flex-col gap-2">
+        <span className="text-sm font-semibold text-gray-900">
+          Codigo postal
+        </span>
+        <input
+          name="postalCode"
+          type="text"
+          required
+          minLength={4}
+          maxLength={12}
+          defaultValue={postalCode ?? ""}
           className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
         />
       </label>

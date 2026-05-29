@@ -2,8 +2,10 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 import { isAdminUser, requireDashboardUser } from "@/lib/auth";
+import { fetchUnreadNotifications } from "@/lib/notifications";
 import { ensureSellerProfile } from "@/lib/sellers";
 
+import { NotificationBell } from "@/app/dashboard/ui/notification-bell";
 import {
   DashboardNavLinks,
   DashboardSettingsLink,
@@ -19,6 +21,7 @@ export default async function DashboardLayout({
   const displayName = seller.store_name;
   const email = seller.contact_email;
   const isAdmin = isAdminUser(user);
+  const notifications = await fetchUnreadNotifications();
 
   return (
     <div className="min-h-screen bg-secondary text-gray-950 md:flex">
@@ -44,6 +47,7 @@ export default async function DashboardLayout({
 
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-20 flex items-center justify-end gap-3 border-b border-primary/10 bg-white px-4 py-3 md:px-8">
+          <NotificationBell notifications={notifications} />
           <DashboardSettingsLink />
           <div className="min-w-0 text-right">
             <p className="truncate text-sm font-semibold text-gray-900">

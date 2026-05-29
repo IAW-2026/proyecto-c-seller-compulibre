@@ -10,6 +10,7 @@ const productWithImages = {
 } satisfies Prisma.ProductInclude;
 
 const orderWithItems = {
+  seller: true,
   items: {
     include: {
       product: true,
@@ -30,6 +31,7 @@ const adminOrderWithRelations = {
   seller: {
     select: {
       store_name: true,
+      seller_address: true,
     },
   },
   items: {
@@ -83,6 +85,11 @@ export type SaleRow = {
   externalBuyerOrderId: string;
   transactionId: string | null;
   buyer: string;
+  buyerAddress: string | null;
+  buyerPostalCode: string | null;
+  sellerId: string;
+  originAddress: string | null;
+  trackingId: string | null;
   status: string;
   itemsCount: number;
   total: string;
@@ -148,6 +155,15 @@ function getProductStatus(stock: number) {
   return "Publicado";
 }
 
+function formatOrderStatus(status: string) {
+  const statuses: Record<string, string> = {
+    PENDING_SHIPMENT: "Despacho Pendiente",
+    LABEL_CREATED: "Despachado",
+  };
+
+  return statuses[status] ?? status;
+}
+
 function serializeProduct(product: ProductWithImages): ProductRow {
   return {
     id: product.id,
@@ -206,7 +222,12 @@ function serializeSale(order: OrderWithItems): SaleRow {
     externalBuyerOrderId: order.external_buyer_order_id,
     transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
-    status: order.status,
+    buyerAddress: order.buyer_address,
+    buyerPostalCode: order.buyer_postal_code,
+    sellerId: order.seller_id,
+    originAddress: order.seller.seller_address,
+    trackingId: order.tracking_id,
+    status: formatOrderStatus(order.status),
     itemsCount,
     total: formatMoney(total),
     createdAt: order.created_at.toISOString(),
@@ -224,7 +245,12 @@ function serializeAdminSale(order: AdminOrderWithRelations): AdminSaleRow {
     externalBuyerOrderId: order.external_buyer_order_id,
     transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
-    status: order.status,
+    buyerAddress: order.buyer_address,
+    buyerPostalCode: order.buyer_postal_code,
+    sellerId: order.seller_id,
+    originAddress: order.seller.seller_address,
+    trackingId: order.tracking_id,
+    status: formatOrderStatus(order.status),
     itemsCount,
     total: formatMoney(total),
     createdAt: order.created_at.toISOString(),
@@ -315,6 +341,8 @@ function getSalesWhere(sellerId: string, query: string) {
         },
       },
       { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_address: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_postal_code: { contains: trimmedQuery, mode: "insensitive" } },
       { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
       { status: { contains: trimmedQuery, mode: "insensitive" } },
       {
@@ -349,6 +377,8 @@ function getAdminSalesWhere(query: string) {
         },
       },
       { buyer_id: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_address: { contains: trimmedQuery, mode: "insensitive" } },
+      { buyer_postal_code: { contains: trimmedQuery, mode: "insensitive" } },
       { transaction_id: { contains: trimmedQuery, mode: "insensitive" } },
       { status: { contains: trimmedQuery, mode: "insensitive" } },
       {
