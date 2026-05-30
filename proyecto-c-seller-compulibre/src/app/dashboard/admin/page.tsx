@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { DeleteProductButton } from "@/app/dashboard/ui/delete-product-button";
-import { EditProductButton } from "@/app/dashboard/ui/edit-product-button";
+import { DeleteProductButton } from "@/app/dashboard/ui/productos/delete-product-button";
+import { EditProductButton } from "@/app/dashboard/ui/productos/edit-product-button";
 import { Pagination } from "@/app/dashboard/ui/pagination";
 import { Search } from "@/app/dashboard/ui/search";
 import { requireAdminUser } from "@/lib/auth";

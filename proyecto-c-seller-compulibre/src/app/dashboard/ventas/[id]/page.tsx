@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { TrackShipmentButton } from "@/app/dashboard/ui/track-shipment-button";
+import { TrackShipmentButton } from "@/app/dashboard/ui/ventas/track-shipment-button";
 import { fetchSaleById } from "@/lib/data";
 
 export default async function SalePage({

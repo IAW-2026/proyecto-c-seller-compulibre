@@ -1,6 +1,6 @@
 import { requireDashboardUser } from "@/lib/auth";
 import { ensureSellerProfile } from "@/lib/sellers";
-import { StoreSettingsForm } from "@/app/dashboard/ui/store-settings-form";
+import { StoreSettingsForm } from "@/app/dashboard/ui/configuracion/store-settings-form";
 
 export default async function SettingsPage() {
   const user = await requireDashboardUser();

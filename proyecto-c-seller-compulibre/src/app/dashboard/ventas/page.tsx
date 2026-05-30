@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Pagination } from "@/app/dashboard/ui/pagination";
 import { Search } from "@/app/dashboard/ui/search";
-import { TrackShipmentButton } from "@/app/dashboard/ui/track-shipment-button";
+import { TrackShipmentButton } from "@/app/dashboard/ui/ventas/track-shipment-button";
 import { fetchSalesPage, fetchSalesPages } from "@/lib/data";
 
 function getCurrentPage(page?: string) {

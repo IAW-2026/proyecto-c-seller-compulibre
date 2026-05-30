@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 
-export function ProductFormSubmitButton({ label }: { label: string }) {
+export function FormSubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
   return (

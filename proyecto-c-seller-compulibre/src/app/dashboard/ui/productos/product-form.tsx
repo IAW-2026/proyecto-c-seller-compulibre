@@ -4,7 +4,7 @@ import Link from "next/link";
 import { createProductFromForm } from "@/lib/product-actions";
 
 import { ImageUploadField } from "./image-upload-field";
-import { ProductFormSubmitButton } from "./product-form-submit-button";
+import { FormSubmitButton } from "../form-submit-button";
 
 const categories = Object.values(ProductCategory);
 const conditions = Object.values(ProductCondition);
@@ -197,7 +197,7 @@ export function ProductForm({
         >
           Cancelar
         </Link>
-        <ProductFormSubmitButton label={submitLabel} />
+        <FormSubmitButton label={submitLabel} />
       </div>
     </form>
   );

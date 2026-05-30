@@ -11,7 +11,7 @@ import {
   type UpdateStoreSettingsState,
 } from "@/lib/seller-actions";
 
-import { ProductFormSubmitButton } from "./product-form-submit-button";
+import { FormSubmitButton } from "../form-submit-button";
 
 const initialState: UpdateStoreSettingsState = {
   status: "idle",
@@ -135,7 +135,7 @@ export function StoreSettingsForm({
       ) : null}
 
       <div className="flex justify-end">
-        <ProductFormSubmitButton label="Guardar cambios" />
+        <FormSubmitButton label="Guardar cambios" />
       </div>
     </form>
   );

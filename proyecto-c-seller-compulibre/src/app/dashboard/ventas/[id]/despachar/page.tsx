@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { DispatchForm } from "@/app/dashboard/ui/dispatch-form";
+import { DispatchForm } from "@/app/dashboard/ui/ventas/dispatch-form";
 import { fetchSaleById } from "@/lib/data";
 
 export default async function DispatchSalePage({
