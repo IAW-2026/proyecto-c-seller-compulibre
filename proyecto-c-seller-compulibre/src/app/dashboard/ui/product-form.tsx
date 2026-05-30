@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createProductFromForm } from "@/lib/product-actions";
 
 import { ImageUploadField } from "./image-upload-field";
+import { ProductFormSubmitButton } from "./product-form-submit-button";
 
 const categories = Object.values(ProductCategory);
 const conditions = Object.values(ProductCondition);
@@ -196,12 +197,7 @@ export function ProductForm({
         >
           Cancelar
         </Link>
-        <button
-          type="submit"
-          className="rounded-lg bg-highlight px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85"
-        >
-          {submitLabel}
-        </button>
+        <ProductFormSubmitButton label={submitLabel} />
       </div>
     </form>
   );

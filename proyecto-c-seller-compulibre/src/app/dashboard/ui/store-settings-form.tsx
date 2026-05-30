@@ -11,6 +11,8 @@ import {
   type UpdateStoreSettingsState,
 } from "@/lib/seller-actions";
 
+import { ProductFormSubmitButton } from "./product-form-submit-button";
+
 const initialState: UpdateStoreSettingsState = {
   status: "idle",
   message: "",
@@ -44,7 +46,7 @@ export function StoreSettingsForm({
   postalCode,
 }: StoreSettingsFormProps) {
   const address = parseSellerAddress(sellerAddress);
-  const [state, formAction, pending] = useActionState(
+  const [state, formAction] = useActionState(
     updateSellerSettings,
     initialState
   );
@@ -133,13 +135,7 @@ export function StoreSettingsForm({
       ) : null}
 
       <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-lg bg-highlight px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85 disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {pending ? "Guardando..." : "Guardar cambios"}
-        </button>
+        <ProductFormSubmitButton label="Guardar cambios" />
       </div>
     </form>
   );
