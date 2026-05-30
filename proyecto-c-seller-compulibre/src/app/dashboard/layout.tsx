@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   const notifications = await fetchUnreadNotifications();
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-secondary text-gray-950">
+    <div className="min-h-screen overflow-x-clip bg-secondary text-gray-950">
       <aside className="hidden border-b border-primary/10 bg-white xl:fixed xl:inset-y-0 xl:left-0 xl:z-30 xl:flex xl:w-72 xl:flex-col xl:border-b-0 xl:border-r">
         <div className="flex w-full flex-col gap-4 p-4 md:p-6">
           <Link href="/dashboard" className="flex items-center gap-3">
@@ -46,7 +46,7 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1 overflow-x-hidden xl:ml-72">
+      <div className="min-w-0 flex-1 overflow-x-clip xl:ml-72">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-primary/10 bg-white px-4 py-3 xl:justify-end md:px-8">
           <MobileDashboardSidebar isAdmin={isAdmin} />
 
@@ -71,7 +71,7 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main className="overflow-x-hidden p-4 md:p-8">{children}</main>
+        <main className="overflow-x-clip p-4 md:p-8">{children}</main>
       </div>
     </div>
   );

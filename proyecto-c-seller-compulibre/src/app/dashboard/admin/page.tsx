@@ -134,6 +134,7 @@ export default async function AdminPage({
                           <EditProductButton productId={product.id} />
                           <DeleteProductButton
                             productId={product.id}
+                            productName={product.name}
                             redirectPath="/dashboard/admin"
                           />
                         </div>

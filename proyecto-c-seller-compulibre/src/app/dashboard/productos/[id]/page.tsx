@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
+import { PencilIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
+import { DeleteProductButton } from "@/app/dashboard/ui/productos/delete-product-button";
 import { fetchProductById } from "@/lib/data";
 
 export default async function ProductPage({
@@ -90,6 +93,21 @@ export default async function ProductPage({
           {product.description || "Este producto todavia no tiene descripcion."}
         </p>
       </section>
+
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <Link
+          href={`/dashboard/productos/${product.id}/edit`}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/85"
+        >
+          <PencilIcon className="h-4 w-4" aria-hidden="true" />
+          Editar producto
+        </Link>
+        <DeleteProductButton
+          productId={product.id}
+          productName={product.name}
+          showLabel
+        />
+      </div>
     </div>
   );
 }

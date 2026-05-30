@@ -108,7 +108,10 @@ export default async function ProductsPage({
                     <td className="px-3 py-4 md:px-5">
                       <div className="flex justify-end gap-2">
                         <EditProductButton productId={product.id} />
-                        <DeleteProductButton productId={product.id} />
+                        <DeleteProductButton
+                          productId={product.id}
+                          productName={product.name}
+                        />
                       </div>
                     </td>
                   </tr>
