@@ -57,30 +57,26 @@ function getShippingNotificationMessage(
   nextStatus: ShippingStatus
 ) {
   if (previousStatus === nextStatus && nextStatus === "IN_TRANSIT") {
-    return "Tu envio esta mas cerca!";
+    return "Tu orden esta mas cerca!";
   }
 
   if (previousStatus === "LABEL_CREATED" && nextStatus === "IN_TRANSIT") {
-    return "Tu envio esta en camino!";
+    return "Tu orden esta en camino!";
   }
 
   if (previousStatus === "IN_TRANSIT" && nextStatus === "DELIVERED") {
-    return "Tu envio fue entregado con exito!";
-  }
-
-  if (nextStatus === "LABEL_CREATED") {
-    return "Tu envio fue despachado!";
+    return "Tu orden fue entregada con exito!";
   }
 
   if (nextStatus === "IN_TRANSIT") {
-    return "Tu envio esta en camino!";
+    return "Tu orden esta en camino!";
   }
 
   if (nextStatus === "DELIVERED") {
-    return "Tu envio fue entregado con exito!";
+    return "Tu orden fue entregada con exito!";
   }
 
-  return "El estado de tu envio fue actualizado.";
+  return "El estado de tu orden fue actualizado.";
 }
 
 export async function handleShippingWebhook(
@@ -115,6 +111,7 @@ export async function handleShippingWebhook(
   }
 
   const shouldUpdateStatus = order.status !== input.status;
+  const shouldCreateNotification = input.status !== "LABEL_CREATED";
   const message = getShippingNotificationMessage(order.status, input.status);
 
   await prisma.$transaction(async (tx) => {
@@ -129,14 +126,16 @@ export async function handleShippingWebhook(
       });
     }
 
-    await tx.notification.create({
-      data: {
-        seller_id: order.seller_id,
-        title: "Actualizacion de envio",
-        message,
-        href: `/dashboard/ventas/${order.id}`,
-      },
-    });
+    if (shouldCreateNotification) {
+      await tx.notification.create({
+        data: {
+          seller_id: order.seller_id,
+          title: "Actualizacion de envio",
+          message,
+          href: `/dashboard/ventas/${order.id}`,
+        },
+      });
+    }
   });
 
   revalidatePath("/dashboard", "layout");
