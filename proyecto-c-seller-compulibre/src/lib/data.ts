@@ -82,6 +82,8 @@ export type ProductRow = {
 
 export type SaleRow = {
   id: string;
+  orderNumber: number;
+  orderName: string;
   externalBuyerOrderId: string;
   transactionId: string | null;
   buyer: string;
@@ -221,6 +223,8 @@ function serializeSale(order: OrderWithItems): SaleRow {
 
   return {
     id: order.id,
+    orderNumber: order.order_number,
+    orderName: `Orden #${order.order_number}`,
     externalBuyerOrderId: order.external_buyer_order_id,
     transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
@@ -244,6 +248,8 @@ function serializeAdminSale(order: AdminOrderWithRelations): AdminSaleRow {
 
   return {
     id: order.id,
+    orderNumber: order.order_number,
+    orderName: `Orden #${order.order_number}`,
     externalBuyerOrderId: order.external_buyer_order_id,
     transactionId: order.transaction_id,
     buyer: order.buyer_id ?? "Orden externa",
@@ -435,9 +441,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     );
   }, 0);
   const pendingOrders = orders.filter((order) => {
-    return !["entregada", "cancelada", "completed", "cancelled"].includes(
-      order.status.toLowerCase()
-    );
+    return order.status === "PENDING_SHIPMENT";
   }).length;
 
   return {

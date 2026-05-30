@@ -109,14 +109,21 @@ export async function registerShipmentFromForm(
       throw new Error("Configura la direccion de tu tienda antes de despachar");
     }
 
+    const shippingApiKey = process.env.SHIPPING_API_KEY;
+
+    if (!shippingApiKey) {
+      throw new Error("Falta configurar SHIPPING_API_KEY");
+    }
+
     const response = await fetch(`${SHIPPING_APP_URL}/api/shipments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": shippingApiKey,
       },
       body: JSON.stringify({
         sellerOrderId: order.id,
-        buyerId: order.buyer_id,
+        buyerOrderId: order.external_buyer_order_id,
         sellerId: order.seller_id,
         courier,
         externalTrackingId,

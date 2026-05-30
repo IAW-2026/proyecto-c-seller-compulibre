@@ -210,7 +210,7 @@ export default async function AdminPage({
                           href={`/dashboard/ventas/${sale.id}`}
                           className="transition hover:text-primary"
                         >
-                          {sale.externalBuyerOrderId}
+                          {sale.orderName}
                         </Link>
                       </td>
                       <td className="px-3 py-4 text-gray-600 md:px-5">

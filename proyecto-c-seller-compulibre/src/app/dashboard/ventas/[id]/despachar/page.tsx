@@ -53,7 +53,7 @@ export default async function DispatchSalePage({
           Registrar despacho
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-          Orden {sale.externalBuyerOrderId}
+          {sale.orderName}
         </p>
       </header>
 

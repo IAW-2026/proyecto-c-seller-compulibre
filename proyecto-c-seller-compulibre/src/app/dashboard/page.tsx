@@ -19,7 +19,7 @@ export default async function Page() {
     {
       label: "Pedidos pendientes",
       value: dashboardStats.pendingOrders.toString(),
-      detail: "Ordenes por revisar",
+      detail: "Ordenes por despachar",
     },
   ];
 

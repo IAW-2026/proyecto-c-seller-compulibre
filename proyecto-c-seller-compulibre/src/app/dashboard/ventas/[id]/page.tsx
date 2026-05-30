@@ -24,7 +24,7 @@ export default async function SalePage({
             Venta
           </p>
           <h1 className="mt-2 text-3xl font-bold text-primary">
-            {sale.externalBuyerOrderId}
+            {sale.orderName}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
             Detalle de los productos descontados del catalogo.
@@ -135,12 +135,6 @@ export default async function SalePage({
           Referencias externas
         </h2>
         <dl className="mt-4 grid gap-3 text-sm">
-          <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
-            <dt className="text-gray-500">Orden comprador</dt>
-            <dd className="font-medium text-gray-950">
-              {sale.externalBuyerOrderId}
-            </dd>
-          </div>
           <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
             <dt className="text-gray-500">Transaccion</dt>
             <dd className="font-medium text-gray-950">

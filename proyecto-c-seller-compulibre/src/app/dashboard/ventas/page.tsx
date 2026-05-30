@@ -76,7 +76,7 @@ export default async function SalesPage({
                         href={`/dashboard/ventas/${sale.id}`}
                         className="transition hover:text-primary"
                       >
-                        {sale.externalBuyerOrderId}
+                        {sale.orderName}
                       </Link>
                     </td>
                     <td className="hidden px-5 py-4 text-gray-600 md:table-cell">

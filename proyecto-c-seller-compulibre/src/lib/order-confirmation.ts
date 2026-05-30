@@ -227,6 +227,7 @@ export async function confirmCatalogOrder(
       },
       select: {
         id: true,
+        order_number: true,
         status: true,
       },
     });
@@ -235,7 +236,7 @@ export async function confirmCatalogOrder(
       data: {
         seller_id: sellerId,
         title: "Nueva venta",
-        message: `Recibiste una nueva venta: ${input.orderReference}`,
+        message: `Recibiste una nueva venta: Orden #${sellerOrder.order_number}`,
         href: `/dashboard/ventas/${sellerOrder.id}`,
       },
     });
