@@ -40,7 +40,7 @@ export function NotificationBell({
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 top-12 z-30 w-80 overflow-hidden rounded-lg border border-primary/10 bg-white shadow-lg">
+        <div className="fixed left-4 right-4 top-16 z-30 overflow-hidden rounded-lg border border-primary/10 bg-white shadow-lg sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-80">
           <div className="border-b border-primary/10 px-4 py-3">
             <p className="text-sm font-semibold text-primary">
               Notificaciones
