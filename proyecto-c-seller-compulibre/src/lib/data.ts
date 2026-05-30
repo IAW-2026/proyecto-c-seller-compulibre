@@ -159,6 +159,8 @@ function formatOrderStatus(status: string) {
   const statuses: Record<string, string> = {
     PENDING_SHIPMENT: "Despacho Pendiente",
     LABEL_CREATED: "Despachado",
+    IN_TRANSIT: "En camino",
+    DELIVERED: "Entregado",
   };
 
   return statuses[status] ?? status;
