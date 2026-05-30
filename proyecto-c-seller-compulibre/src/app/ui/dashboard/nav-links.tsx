@@ -73,7 +73,7 @@ export function DashboardNavLinks({ isAdmin = false }: { isAdmin?: boolean }) {
   const visibleLinks = isAdmin ? [...links, adminLink] : links;
 
   return (
-    <nav className="flex gap-2 md:mt-4 md:flex-col" aria-label="Dashboard">
+    <nav className="flex flex-col gap-2 md:mt-4" aria-label="Dashboard">
       {visibleLinks.map((link) => (
         <DashboardNavLink key={link.name} {...link} />
       ))}

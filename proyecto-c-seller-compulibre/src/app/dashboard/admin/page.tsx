@@ -48,7 +48,7 @@ export default async function AdminPage({
   ]);
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       <header>
         <p className="text-sm font-semibold uppercase tracking-wide text-highlight">
           Administrador
@@ -72,19 +72,31 @@ export default async function AdminPage({
           />
         </div>
 
-        <div className="rounded-lg border border-primary/10 bg-white shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="w-full overflow-hidden rounded-lg border border-primary/10 bg-white shadow-sm">
+          <div className="w-full max-w-full overflow-x-auto">
             {products.length > 0 ? (
-              <table className="w-full min-w-220 text-left text-sm">
+              <table className="w-full min-w-full text-left text-sm lg:min-w-220">
                 <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                   <tr>
-                    <th className="px-5 py-3 font-semibold">Producto</th>
-                    <th className="px-5 py-3 font-semibold">Seller</th>
-                    <th className="px-5 py-3 font-semibold">Marca</th>
-                    <th className="px-5 py-3 font-semibold">Stock</th>
-                    <th className="px-5 py-3 font-semibold">Precio</th>
-                    <th className="px-5 py-3 font-semibold">Estado</th>
-                    <th className="w-28 px-5 py-3">
+                    <th className="px-3 py-3 font-semibold md:px-5">
+                      Producto
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                      Seller
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold lg:table-cell">
+                      Marca
+                    </th>
+                    <th className="px-3 py-3 text-center font-semibold md:px-5 md:text-left">
+                      Stock
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                      Precio
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold lg:table-cell">
+                      Estado
+                    </th>
+                    <th className="w-24 px-3 py-3 md:w-28 md:px-5">
                       <span className="sr-only">Acciones</span>
                     </th>
                   </tr>
@@ -92,7 +104,7 @@ export default async function AdminPage({
                 <tbody className="divide-y divide-primary/10">
                   {products.map((product) => (
                     <tr key={product.id}>
-                      <td className="px-5 py-4 font-medium text-gray-950">
+                      <td className="px-3 py-4 font-medium text-gray-950 md:px-5">
                         <Link
                           href={`/dashboard/productos/${product.id}`}
                           className="transition hover:text-primary"
@@ -100,24 +112,24 @@ export default async function AdminPage({
                           {product.name}
                         </Link>
                       </td>
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="hidden px-5 py-4 text-gray-600 md:table-cell">
                         {product.sellerName}
                       </td>
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="hidden px-5 py-4 text-gray-600 lg:table-cell">
                         {product.brand}
                       </td>
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="px-3 py-4 text-center text-gray-600 md:px-5 md:text-left">
                         {product.stock}
                       </td>
-                      <td className="px-5 py-4 font-semibold text-primary">
+                      <td className="hidden px-5 py-4 font-semibold text-primary md:table-cell">
                         {product.price}
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="hidden px-5 py-4 lg:table-cell">
                         <span className="inline-flex whitespace-nowrap rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
                           {product.status}
                         </span>
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-3 py-4 md:px-5">
                         <div className="flex justify-end gap-2">
                           <EditProductButton productId={product.id} />
                           <DeleteProductButton
@@ -163,24 +175,36 @@ export default async function AdminPage({
           />
         </div>
 
-        <div className="rounded-lg border border-primary/10 bg-white shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="w-full overflow-hidden rounded-lg border border-primary/10 bg-white shadow-sm">
+          <div className="w-full max-w-full overflow-x-auto">
             {sales.length > 0 ? (
-              <table className="w-full min-w-220 text-left text-sm">
+              <table className="w-full min-w-full text-left text-sm lg:min-w-220">
                 <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                   <tr>
-                    <th className="px-5 py-3 font-semibold">Orden</th>
-                    <th className="px-5 py-3 font-semibold">Seller</th>
-                    <th className="px-5 py-3 font-semibold">Comprador</th>
-                    <th className="px-5 py-3 font-semibold">Items</th>
-                    <th className="px-5 py-3 font-semibold">Total</th>
-                    <th className="px-5 py-3 font-semibold">Estado</th>
+                    <th className="px-3 py-3 font-semibold md:px-5">
+                      Orden
+                    </th>
+                    <th className="px-3 py-3 font-semibold md:px-5">
+                      Seller
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                      Comprador
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold lg:table-cell">
+                      Items
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold lg:table-cell">
+                      Total
+                    </th>
+                    <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                      Estado
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-primary/10">
                   {sales.map((sale) => (
                     <tr key={sale.id}>
-                      <td className="px-5 py-4 font-medium text-gray-950">
+                      <td className="px-3 py-4 font-medium text-gray-950 md:px-5">
                         <Link
                           href={`/dashboard/ventas/${sale.id}`}
                           className="transition hover:text-primary"
@@ -188,19 +212,19 @@ export default async function AdminPage({
                           {sale.externalBuyerOrderId}
                         </Link>
                       </td>
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="px-3 py-4 text-gray-600 md:px-5">
                         {sale.sellerName}
                       </td>
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="hidden px-5 py-4 text-gray-600 md:table-cell">
                         {sale.buyer}
                       </td>
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="hidden px-5 py-4 text-gray-600 lg:table-cell">
                         {sale.itemsCount}
                       </td>
-                      <td className="px-5 py-4 font-semibold text-primary">
+                      <td className="hidden px-5 py-4 font-semibold text-primary lg:table-cell">
                         {sale.total}
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="hidden px-5 py-4 md:table-cell">
                         <span className="inline-flex whitespace-nowrap rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
                           {sale.status}
                         </span>

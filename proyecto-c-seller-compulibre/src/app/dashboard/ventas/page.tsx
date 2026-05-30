@@ -29,7 +29,7 @@ export default async function SalesPage({
   ]);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <header>
         <p className="text-sm font-semibold uppercase tracking-wide text-highlight">
           Ventas
@@ -44,18 +44,26 @@ export default async function SalesPage({
 
       <Search placeholder="Buscar ventas..." />
 
-      <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
-        <div className="overflow-x-auto">
+      <section className="w-full overflow-hidden rounded-lg border border-primary/10 bg-white shadow-sm">
+        <div className="w-full max-w-full overflow-x-auto">
           {sales.length > 0 ? (
-            <table className="w-full min-w-160 text-left text-sm">
+            <table className="w-full min-w-full text-left text-sm md:min-w-160">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
-                  <th className="px-5 py-3 font-semibold">Orden</th>
-                  <th className="px-5 py-3 font-semibold">Comprador</th>
-                  <th className="px-5 py-3 font-semibold">Items</th>
-                  <th className="px-5 py-3 font-semibold">Total</th>
-                  <th className="px-5 py-3 font-semibold">Estado</th>
-                  <th className="px-5 py-3">
+                  <th className="px-3 py-3 font-semibold md:px-5">Orden</th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Comprador
+                  </th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Items
+                  </th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Total
+                  </th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Estado
+                  </th>
+                  <th className="px-3 py-3 md:px-5">
                     <span className="sr-only">Envio</span>
                   </th>
                 </tr>
@@ -63,7 +71,7 @@ export default async function SalesPage({
               <tbody className="divide-y divide-primary/10">
                 {sales.map((sale) => (
                   <tr key={sale.id}>
-                    <td className="px-5 py-4 font-medium text-gray-950">
+                    <td className="px-3 py-4 font-medium text-gray-950 md:px-5">
                       <Link
                         href={`/dashboard/ventas/${sale.id}`}
                         className="transition hover:text-primary"
@@ -71,19 +79,21 @@ export default async function SalesPage({
                         {sale.externalBuyerOrderId}
                       </Link>
                     </td>
-                    <td className="px-5 py-4 text-gray-600">{sale.buyer}</td>
-                    <td className="px-5 py-4 text-gray-600">
+                    <td className="hidden px-5 py-4 text-gray-600 md:table-cell">
+                      {sale.buyer}
+                    </td>
+                    <td className="hidden px-5 py-4 text-gray-600 md:table-cell">
                       {sale.itemsCount}
                     </td>
-                    <td className="px-5 py-4 font-semibold text-primary">
+                    <td className="hidden px-5 py-4 font-semibold text-primary md:table-cell">
                       {sale.total}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="hidden px-5 py-4 md:table-cell">
                       <span className="rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
                         {sale.status}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-3 py-4 text-right md:px-5">
                       <TrackShipmentButton trackingId={sale.trackingId} />
                     </td>
                   </tr>

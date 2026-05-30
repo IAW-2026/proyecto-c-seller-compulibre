@@ -57,7 +57,7 @@ export default async function Page() {
         </div>
         <div className="overflow-x-auto">
           {products.length > 0 ? (
-            <table className="w-full min-w-155 text-left text-sm">
+            <table className="w-full min-w-full md:min-w-155 text-left text-sm">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Producto</th>

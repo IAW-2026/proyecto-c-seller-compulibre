@@ -31,7 +31,7 @@ export default async function ProductsPage({
   ]);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-highlight">
@@ -54,18 +54,28 @@ export default async function ProductsPage({
         </Link>
       </div>
 
-      <section className="rounded-lg border border-primary/10 bg-white shadow-sm">
-        <div className="overflow-x-auto">
+      <section className="w-full overflow-hidden rounded-lg border border-primary/10 bg-white shadow-sm">
+        <div className="w-full max-w-full overflow-x-auto">
           {products.length > 0 ? (
-            <table className="w-full min-w-180 text-left text-sm">
+            <table className="w-full min-w-full text-left text-sm md:min-w-180">
               <thead className="bg-secondary/70 text-xs uppercase text-gray-500">
                 <tr>
-                  <th className="px-5 py-3 font-semibold">Producto</th>
-                  <th className="px-5 py-3 font-semibold">Marca</th>
-                  <th className="px-5 py-3 font-semibold">Stock</th>
-                  <th className="px-5 py-3 font-semibold">Precio</th>
-                  <th className="px-5 py-3 font-semibold">Estado</th>
-                  <th className="w-28 px-5 py-3">
+                  <th className="px-3 py-3 font-semibold md:px-5">
+                    Producto
+                  </th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Marca
+                  </th>
+                  <th className="px-3 py-3 text-center font-semibold md:px-5 md:text-left">
+                    Stock
+                  </th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Precio
+                  </th>
+                  <th className="hidden px-5 py-3 font-semibold md:table-cell">
+                    Estado
+                  </th>
+                  <th className="w-24 px-3 py-3 md:w-28 md:px-5">
                     <span className="sr-only">Acciones</span>
                   </th>
                 </tr>
@@ -73,7 +83,7 @@ export default async function ProductsPage({
               <tbody className="divide-y divide-primary/10">
                 {products.map((product) => (
                   <tr key={product.id}>
-                    <td className="px-5 py-4 font-medium text-gray-950">
+                    <td className="px-3 py-4 font-medium text-gray-950 md:px-5">
                       <Link
                         href={`/dashboard/productos/${product.id}`}
                         className="transition hover:text-primary"
@@ -81,21 +91,21 @@ export default async function ProductsPage({
                         {product.name}
                       </Link>
                     </td>
-                    <td className="px-5 py-4 text-gray-600">
+                    <td className="hidden px-5 py-4 text-gray-600 md:table-cell">
                       {product.brand}
                     </td>
-                    <td className="px-5 py-4 text-gray-600">
+                    <td className="px-3 py-4 text-center text-gray-600 md:px-5 md:text-left">
                       {product.stock}
                     </td>
-                    <td className="px-5 py-4 font-semibold text-primary">
+                    <td className="hidden px-5 py-4 font-semibold text-primary md:table-cell">
                       {product.price}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="hidden px-5 py-4 md:table-cell">
                       <span className="inline-flex whitespace-nowrap rounded-md bg-accent/50 px-2 py-1 text-xs font-semibold text-primary">
                         {product.status}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-4 md:px-5">
                       <div className="flex justify-end gap-2">
                         <EditProductButton productId={product.id} />
                         <DeleteProductButton productId={product.id} />
