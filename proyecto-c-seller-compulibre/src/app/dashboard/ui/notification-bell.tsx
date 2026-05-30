@@ -33,7 +33,7 @@ export function NotificationBell({
       >
         <BellIcon className="h-5 w-5" aria-hidden="true" />
         {unreadCount > 0 ? (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-highlight px-1 text-[11px] font-bold leading-none text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold leading-none text-white">
             {badgeLabel}
           </span>
         ) : null}
