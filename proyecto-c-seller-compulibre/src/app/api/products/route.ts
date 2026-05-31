@@ -1,33 +1,28 @@
-// src/app/api/products/route.ts
-import { prisma } from '@/lib/prisma'
+import { isAuthorized } from "@/lib/api-auth";
+import { getCatalogProducts } from "@/lib/product-catalog";
 
-export async function GET() {
-  const products = await prisma.product.findMany()
-  return Response.json(products)
+export async function GET(request: Request) {
+  if (!isAuthorized(request, process.env.BUYER_API_KEY)) {
+    return Response.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const catalog = await getCatalogProducts({
+    query: searchParams.get("query"),
+    category: searchParams.get("category"),
+    condition: searchParams.get("condition"),
+    minPrice: searchParams.get("minPrice"),
+    maxPrice: searchParams.get("maxPrice"),
+    sort: searchParams.get("sort"),
+    ascendingPrice: searchParams.get("ascendingPrice"),
+    descendingPrice: searchParams.get("descendingPrice"),
+    page: searchParams.get("page"),
+    limit: searchParams.get("limit"),
+  });
+
+  return Response.json(catalog);
 }
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json()
-
-    const product = await prisma.product.create({
-      data: {
-        name: body.name,
-        category: body.category,
-        price: body.price,
-        brand: body.brand,
-        stock_available: body.stock,
-        condition: body.condition,
-        seller_id: body.sellerId,
-      },
-    })
-
-    return Response.json(product, { status: 201 })
-  } catch (error) {
-    console.error(error)
-    return Response.json(
-      { error: 'Error al crear el producto' },
-      { status: 500 }
-    )
-  }
+export async function POST() {
+  return Response.json({ error: "Metodo no permitido" }, { status: 405 });
 }

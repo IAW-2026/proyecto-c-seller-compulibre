@@ -8,31 +8,95 @@ datasource db {
 }
 
 model SellerProfile {
-  id             String   @id @default(cuid())
-  clerk_user_id  String   @unique
+  clerk_user_id  String   @id
   store_name     String
   contact_email  String
+  seller_address String?
+  postal_code    String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   products       Product[]
   orders         SellerOrder[]
+  notifications  Notification[]
 }
 
 model Product {
   id              String   @id @default(cuid())
-  seller_id        String
+  seller_id       String
   name            String
-  category        String
+  description     String?
+  category        ProductCategory
   price           Decimal  @db.Decimal(10, 2)
   brand           String
-  stock_available Int
+  stock           Int
   condition       ProductCondition
+  images          ProductImage[]
 
-  seller          SellerProfile @relation(fields: [seller_id], references: [id])
+  seller          SellerProfile @relation(fields: [seller_id], references: [clerk_user_id])
   orderItems      SellerOrderItem[]
+
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   @@index([name])
   @@index([category])
   @@index([brand])
+  @@index([seller_id])
+}
+
+model ProductImage {
+  id          String  @id @default(cuid())
+  product_id  String
+  image_url   String
+
+  product     Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model SellerOrder {
+  id                       String   @id @default(cuid())
+  order_number             Int      @unique @default(autoincrement())
+  external_buyer_order_id  String
+  buyer_id                 String?
+  buyer_address            String?
+  buyer_postal_code        String?
+  tracking_id              String?
+  transaction_id           String?  @unique
+  seller_id                String
+  status                   String
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+
+  seller       SellerProfile @relation(fields: [seller_id], references: [clerk_user_id])
+  items        SellerOrderItem[]
+
+  @@index([seller_id])
+  @@index([external_buyer_order_id])
+}
+
+model SellerOrderItem {
+  id              String @id @default(cuid())
+  product_id      String
+  seller_order_id String
+  quantity        Int
+  price           Decimal @db.Decimal(10, 2)
+
+  product     Product     @relation(fields: [product_id], references: [id])
+  order       SellerOrder @relation(fields: [seller_order_id], references: [id])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  seller_id  String
+  title      String
+  message    String
+  href       String?
+  created_at DateTime @default(now())
+
+  seller     SellerProfile @relation(fields: [seller_id], references: [clerk_user_id], onDelete: Cascade)
+
+  @@index([seller_id])
+  @@index([created_at])
 }
 
 enum ProductCondition {
@@ -41,23 +105,16 @@ enum ProductCondition {
   REFURBISHED
 }
 
-model SellerOrder {
-  id                       String   @id @default(cuid())
-  external_buyer_order_id  String
-  seller_id                String
-  status                   String
-
-  seller       SellerProfile @relation(fields: [seller_id], references: [id])
-  items        SellerOrderItem[]
-}
-
-model SellerOrderItem {
-  id              String @id @default(cuid())
-  product_id      String
-  seller_order_id String
-  quantity        Int
-  price           Float
-
-  product     Product     @relation(fields: [product_id], references: [id])
-  order       SellerOrder @relation(fields: [seller_order_id], references: [id])
+enum ProductCategory {
+  CPU
+  GPU
+  RAM
+  STORAGE
+  MOTHERBOARD
+  PSU
+  CASE
+  COOLER
+  MONITOR
+  PERIPHERAL
+  OTHER
 }
