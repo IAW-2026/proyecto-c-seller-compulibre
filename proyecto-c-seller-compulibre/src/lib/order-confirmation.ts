@@ -178,25 +178,6 @@ export async function confirmCatalogOrder(
           409
         );
       }
-
-      const updatedProduct = await tx.product.updateMany({
-        where: {
-          id: item.productId,
-          stock: { gte: item.quantity },
-        },
-        data: {
-          stock: {
-            decrement: item.quantity,
-          },
-        },
-      });
-
-      if (updatedProduct.count !== 1) {
-        throw new OrderConfirmationError(
-          `Stock insuficiente para el producto ${item.productId}`,
-          409
-        );
-      }
     }
 
     const sellerId = products[0].seller_id;
@@ -244,7 +225,7 @@ export async function confirmCatalogOrder(
     return {
       sellerOrderId: sellerOrder.id,
       status: sellerOrder.status,
-      message: "Stock descontado exitosamente",
+      message: "Orden confirmada exitosamente",
     };
   });
 }
