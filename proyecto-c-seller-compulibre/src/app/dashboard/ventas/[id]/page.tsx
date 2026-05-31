@@ -1,7 +1,10 @@
+import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
+import { RefreshShipmentButton } from "@/app/dashboard/ui/ventas/refresh-shipment-button";
 import { TrackShipmentButton } from "@/app/dashboard/ui/ventas/track-shipment-button";
+import { isAdminUser } from "@/lib/auth";
 import { fetchSaleById } from "@/lib/data";
 
 export default async function SalePage({
@@ -11,6 +14,8 @@ export default async function SalePage({
 }) {
   const { id } = await params;
   const sale = await fetchSaleById(id);
+  const user = await currentUser();
+  const isAdmin = isAdminUser(user);
 
   if (!sale) {
     notFound();
@@ -47,7 +52,15 @@ export default async function SalePage({
               Registrar despacho
             </Link>
           )}
-          <TrackShipmentButton trackingId={sale.trackingId} />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {isAdmin ? (
+              <RefreshShipmentButton
+                saleId={sale.id}
+                trackingId={sale.trackingId}
+              />
+            ) : null}
+            <TrackShipmentButton trackingId={sale.trackingId} />
+          </div>
         </div>
       </header>
 
