@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 
+import { DeleteProductButton } from "@/app/dashboard/ui/productos/delete-product-button";
+import { EditProductButtonId } from "@/app/dashboard/ui/productos/edit-product-button";
 import { fetchProductById } from "@/lib/data";
 
 export default async function ProductPage({
@@ -90,6 +92,17 @@ export default async function ProductPage({
           {product.description || "Este producto todavia no tiene descripcion."}
         </p>
       </section>
+
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <DeleteProductButton
+          productId={product.id}
+          productName={product.name}
+          showLabel
+        />
+        <EditProductButtonId 
+          productId={product.id} 
+        />
+      </div>
     </div>
   );
 }

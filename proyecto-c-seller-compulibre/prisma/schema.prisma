@@ -55,6 +55,7 @@ model ProductImage {
 
 model SellerOrder {
   id                       String   @id @default(cuid())
+  order_number             Int      @unique @default(autoincrement())
   external_buyer_order_id  String
   buyer_id                 String?
   buyer_address            String?

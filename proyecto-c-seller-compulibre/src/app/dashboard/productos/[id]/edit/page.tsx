@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { ProductForm } from "@/app/dashboard/ui/product-form";
+import { ProductForm } from "@/app/dashboard/ui/productos/product-form";
 import { fetchProductById } from "@/lib/data";
 import { updateProductFromForm } from "@/lib/product-actions";
 

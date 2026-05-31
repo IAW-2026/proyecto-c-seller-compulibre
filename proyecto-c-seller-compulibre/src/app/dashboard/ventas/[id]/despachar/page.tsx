@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { DispatchForm } from "@/app/dashboard/ui/dispatch-form";
+import { DispatchForm } from "@/app/dashboard/ui/ventas/dispatch-form";
 import { fetchSaleById } from "@/lib/data";
 
 export default async function DispatchSalePage({
@@ -53,7 +53,7 @@ export default async function DispatchSalePage({
           Registrar despacho
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-          Orden {sale.externalBuyerOrderId}
+          {sale.orderName}
         </p>
       </header>
 

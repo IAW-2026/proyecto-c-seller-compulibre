@@ -34,7 +34,7 @@ export function Search({
   }, 300);
 
   return (
-    <div className="relative flex flex-1">
+    <div className="relative flex w-full flex-1">
       <label htmlFor={inputId} className="sr-only">
         Buscar
       </label>

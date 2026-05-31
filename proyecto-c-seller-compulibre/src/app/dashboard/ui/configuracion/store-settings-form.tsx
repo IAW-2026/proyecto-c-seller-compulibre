@@ -11,6 +11,8 @@ import {
   type UpdateStoreSettingsState,
 } from "@/lib/seller-actions";
 
+import { FormSubmitButton } from "../form-submit-button";
+
 const initialState: UpdateStoreSettingsState = {
   status: "idle",
   message: "",
@@ -44,14 +46,14 @@ export function StoreSettingsForm({
   postalCode,
 }: StoreSettingsFormProps) {
   const address = parseSellerAddress(sellerAddress);
-  const [state, formAction, pending] = useActionState(
+  const [state, formAction] = useActionState(
     updateSellerSettings,
     initialState
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
-      <label className="flex flex-col gap-2">
+    <form action={formAction} className="flex min-w-0 flex-col gap-5">
+      <label className="flex min-w-0 flex-col gap-2">
         <span className="text-sm font-semibold text-gray-900">
           Nombre de tienda
         </span>
@@ -62,12 +64,12 @@ export function StoreSettingsForm({
           minLength={2}
           maxLength={80}
           defaultValue={storeName}
-          className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+          className="w-full min-w-0 rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
         />
       </label>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <label className="flex flex-col gap-2">
+      <div className="grid min-w-0 gap-5 md:grid-cols-2">
+        <label className="flex min-w-0 flex-col gap-2">
           <span className="text-sm font-semibold text-gray-900">
             Provincia
           </span>
@@ -75,7 +77,7 @@ export function StoreSettingsForm({
             name="province"
             required
             defaultValue={address.province}
-            className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+            className="w-full min-w-0 rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
           >
             <option value="" disabled>
               Seleccionar provincia
@@ -88,7 +90,7 @@ export function StoreSettingsForm({
           </select>
         </label>
 
-        <label className="flex flex-col gap-2">
+        <label className="flex min-w-0 flex-col gap-2">
           <span className="text-sm font-semibold text-gray-900">Ciudad</span>
           <input
             name="city"
@@ -98,12 +100,12 @@ export function StoreSettingsForm({
             maxLength={80}
             defaultValue={address.city}
             placeholder="Ingresar ciudad"
-            className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+            className="w-full min-w-0 rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
           />
         </label>
       </div>
 
-      <label className="flex flex-col gap-2">
+      <label className="flex min-w-0 flex-col gap-2">
         <span className="text-sm font-semibold text-gray-900">
           Codigo postal
         </span>
@@ -114,7 +116,7 @@ export function StoreSettingsForm({
           minLength={4}
           maxLength={12}
           defaultValue={postalCode ?? ""}
-          className="rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
+          className="w-full min-w-0 rounded-lg border border-primary/15 bg-white px-4 py-3 text-sm text-gray-950 outline-none transition focus:border-highlight focus:ring-2 focus:ring-highlight/20"
         />
       </label>
 
@@ -133,13 +135,7 @@ export function StoreSettingsForm({
       ) : null}
 
       <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-lg bg-highlight px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-highlight/85 disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {pending ? "Guardando..." : "Guardar cambios"}
-        </button>
+        <FormSubmitButton label="Guardar cambios" />
       </div>
     </form>
   );
