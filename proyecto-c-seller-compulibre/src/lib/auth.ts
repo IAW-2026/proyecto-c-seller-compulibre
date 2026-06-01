@@ -21,6 +21,16 @@ export async function requireDashboardUser() {
   return user;
 }
 
+export async function getAuthenticatedSellerId() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/");
+  }
+
+  return userId;
+}
+
 export function isAdminUser(user: Awaited<ReturnType<typeof currentUser>>) {
   return user?.publicMetadata?.role === "admin";
 }
