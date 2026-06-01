@@ -57,3 +57,5 @@ con la capacidad de actualizar el estado de un envio en la pagina.
 - Las órdenes se numeran de forma independiente por vendedor. Cada tienda comienza con `Orden #1`, en lugar de utilizar una secuencia global compartida.
 
 - La aplicación recibe webhooks de Shipping para actualizar el estado de los envíos y generar notificaciones. Como respaldo, los administradores cuentan con una acción manual para consultar nuevamente el estado del envío si un webhook no llega correctamente.
+
+- Las notificaciones ahora mismo requieren hacer F5 para actualizar, ya que no se hace un polling para actualizar el Badge y mostrar la notificación. En la etapa 3 cuando esten funcionando las 4 apps en conjunto se va a añadir.
