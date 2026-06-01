@@ -3,7 +3,7 @@ import { Prisma, ProductCategory } from "@prisma/client";
 
 import { prisma } from "./prisma";
 import { getAuthenticatedSellerId, isAdminUser } from "./auth";
-import { getBuyerDisplayName } from "./buyers";
+import { getBuyerDisplayName, getBuyerDisplayNames } from "./buyers";
 
 const productWithImages = {
   images: true,
@@ -523,7 +523,16 @@ export async function fetchSalesPage(
     take: SALES_PER_PAGE,
   });
 
-  return orders.map(serializeSale);
+  const buyerDisplayNames = await getBuyerDisplayNames(
+    orders.map((order) => order.buyer_id)
+  );
+
+  return orders.map((order) => ({
+    ...serializeSale(order),
+    buyer: order.buyer_id
+      ? (buyerDisplayNames.get(order.buyer_id) ?? order.buyer_id)
+      : "Orden externa",
+  }));
 }
 
 export async function fetchSalesPages(query: string) {
