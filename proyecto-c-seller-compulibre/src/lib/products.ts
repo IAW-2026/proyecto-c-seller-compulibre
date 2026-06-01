@@ -79,33 +79,6 @@ function serializeProduct(product: ProductWithImages): Product {
   }
 }
 
-export async function getProductsBySeller(
-  sellerId: string
-): Promise<Product[]> {
-  const products = await prisma.product.findMany({
-    where: { seller_id: sellerId },
-    include: productWithImages,
-    orderBy: { created_at: 'desc' },
-  })
-
-  return products.map(serializeProduct)
-}
-
-export async function getProductById(
-  productId: string,
-  sellerId: string
-): Promise<Product | null> {
-  const product = await prisma.product.findFirst({
-    where: {
-      id: productId,
-      seller_id: sellerId,
-    },
-    include: productWithImages,
-  })
-
-  return product ? serializeProduct(product) : null
-}
-
 export async function createProduct(
   input: CreateProductInput
 ): Promise<Product> {

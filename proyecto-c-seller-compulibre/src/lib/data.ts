@@ -1,9 +1,8 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { Prisma, ProductCategory } from "@prisma/client";
-import { redirect } from "next/navigation";
 
 import { prisma } from "./prisma";
-import { isAdminUser } from "./auth";
+import { getAuthenticatedSellerId, isAdminUser } from "./auth";
 import { getBuyerDisplayName } from "./buyers";
 
 const productWithImages = {
@@ -125,16 +124,6 @@ export type DashboardStats = {
   ordersCount: number;
   pendingOrders: number;
 };
-
-async function getAuthenticatedSellerId() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/");
-  }
-
-  return userId;
-}
 
 function formatMoney(value: Prisma.Decimal | number | string) {
   const amount = Number(value);
@@ -467,18 +456,6 @@ export async function fetchLatestProducts(limit = 5): Promise<ProductRow[]> {
   return products.map(serializeProduct);
 }
 
-export async function fetchProducts(): Promise<ProductRow[]> {
-  const sellerId = await getAuthenticatedSellerId();
-
-  const products = await prisma.product.findMany({
-    where: { seller_id: sellerId },
-    include: productWithImages,
-    orderBy: { created_at: "desc" },
-  });
-
-  return products.map(serializeProduct);
-}
-
 export async function fetchProductsPage(
   query: string,
   page: number
@@ -527,18 +504,6 @@ export async function fetchProductById(
   });
 
   return product ? serializeProduct(product) : null;
-}
-
-export async function fetchSales(): Promise<SaleRow[]> {
-  const sellerId = await getAuthenticatedSellerId();
-
-  const orders = await prisma.sellerOrder.findMany({
-    where: { seller_id: sellerId },
-    include: orderWithItems,
-    orderBy: { created_at: "desc" },
-  });
-
-  return orders.map(serializeSale);
 }
 
 export async function fetchSalesPage(

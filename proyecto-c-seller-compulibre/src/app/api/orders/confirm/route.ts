@@ -1,27 +1,13 @@
+import { isAuthorized } from "@/lib/api-auth";
 import {
   confirmCatalogOrder,
   OrderConfirmationError,
   parseConfirmOrderPayload,
 } from "@/lib/order-confirmation";
 
-function isAuthorized(request: Request) {
-  const expectedApiKey = process.env.PAYMENTS_API_KEY;
-
-  if (!expectedApiKey) {
-    return process.env.NODE_ENV !== "production";
-  }
-
-  const apiKey = request.headers.get("x-api-key");
-  const authorization = request.headers.get("authorization");
-
-  return (
-    apiKey === expectedApiKey || authorization === `Bearer ${expectedApiKey}`
-  );
-}
-
 export async function POST(request: Request) {
   try {
-    if (!isAuthorized(request)) {
+    if (!isAuthorized(request, process.env.PAYMENTS_API_KEY)) {
       return Response.json({ error: "No autorizado" }, { status: 401 });
     }
 

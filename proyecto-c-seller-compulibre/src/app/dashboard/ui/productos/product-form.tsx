@@ -2,32 +2,16 @@ import { ProductCategory, ProductCondition } from "@prisma/client";
 import Link from "next/link";
 
 import { createProductFromForm } from "@/lib/product-actions";
+import {
+  PRODUCT_CATEGORY_LABELS,
+  PRODUCT_CONDITION_LABELS,
+} from "@/lib/product-labels";
 
 import { ImageUploadField } from "./image-upload-field";
 import { FormSubmitButton } from "../form-submit-button";
 
 const categories = Object.values(ProductCategory);
 const conditions = Object.values(ProductCondition);
-
-const categoryLabels: Record<ProductCategory, string> = {
-  CPU: "CPU",
-  GPU: "GPU",
-  RAM: "RAM",
-  STORAGE: "Almacenamiento",
-  MOTHERBOARD: "Motherboard",
-  PSU: "Fuente",
-  CASE: "Gabinete",
-  COOLER: "Cooler",
-  MONITOR: "Monitor",
-  PERIPHERAL: "Periferico",
-  OTHER: "Otro",
-};
-
-const conditionLabels: Record<ProductCondition, string> = {
-  NEW: "Nuevo",
-  USED: "Usado",
-  REFURBISHED: "Reacondicionado",
-};
 
 export type ProductFormValues = {
   name: string;
@@ -99,7 +83,7 @@ export function ProductForm({
               </option>
               {categories.map((category) => (
                 <option key={category} value={category}>
-                  {categoryLabels[category]}
+                  {PRODUCT_CATEGORY_LABELS[category]}
                 </option>
               ))}
             </select>
@@ -118,7 +102,7 @@ export function ProductForm({
               </option>
               {conditions.map((condition) => (
                 <option key={condition} value={condition}>
-                  {conditionLabels[condition]}
+                  {PRODUCT_CONDITION_LABELS[condition]}
                 </option>
               ))}
             </select>

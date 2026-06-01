@@ -11,16 +11,7 @@ import {
   fetchAdminSalesPage,
   fetchAdminSalesPages,
 } from "@/lib/data";
-
-function getCurrentPage(page?: string) {
-  const currentPage = Number(page);
-
-  if (!Number.isInteger(currentPage) || currentPage < 1) {
-    return 1;
-  }
-
-  return currentPage;
-}
+import { getCurrentPage } from "@/lib/pagination";
 
 export default async function AdminPage({
   searchParams,
