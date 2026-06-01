@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { prisma } from "./prisma";
 import { isAdminUser } from "./auth";
+import { getBuyerDisplayName } from "./buyers";
 
 const productWithImages = {
   images: true,
@@ -583,7 +584,14 @@ export async function fetchSaleById(saleId: string): Promise<SaleDetail | null> 
     include: orderWithItems,
   });
 
-  return order ? serializeSaleDetail(order) : null;
+  if (!order) {
+    return null;
+  }
+
+  return {
+    ...serializeSaleDetail(order),
+    buyer: await getBuyerDisplayName(order.buyer_id),
+  };
 }
 
 export async function fetchAdminProductsPage(
