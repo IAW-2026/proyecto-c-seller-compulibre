@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { getArgentinaProvince } from "./argentina-provinces";
 import { requireDashboardUser } from "./auth";
@@ -11,6 +12,11 @@ export type UpdateStoreSettingsState = {
   status: "idle" | "success" | "error";
   message: string;
 };
+
+export type StoreSettingsAction = (
+  state: UpdateStoreSettingsState,
+  formData: FormData
+) => Promise<UpdateStoreSettingsState>;
 
 function readStoreName(formData: FormData) {
   const value = formData.get("storeName");
@@ -88,24 +94,7 @@ export async function updateSellerSettings(
   formData: FormData
 ): Promise<UpdateStoreSettingsState> {
   try {
-    const user = await requireDashboardUser();
-    await ensureSellerProfile(user);
-    const province = readProvince(formData);
-    const city = readCity(formData);
-
-    await prisma.sellerProfile.update({
-      where: {
-        clerk_user_id: user.id,
-      },
-      data: {
-        store_name: readStoreName(formData),
-        seller_address: `${province}, ${city}`,
-        postal_code: readPostalCode(formData),
-      },
-    });
-
-    revalidatePath("/dashboard");
-    revalidatePath("/dashboard/configuracion");
+    await saveSellerSettings(formData);
 
     return {
       status: "success",
@@ -120,4 +109,46 @@ export async function updateSellerSettings(
           : "No se pudieron guardar los datos de tienda.",
     };
   }
+}
+
+export async function completeSellerOnboarding(
+  _state: UpdateStoreSettingsState,
+  formData: FormData
+): Promise<UpdateStoreSettingsState> {
+  try {
+    await saveSellerSettings(formData);
+  } catch (error) {
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "No se pudieron guardar los datos de tienda.",
+    };
+  }
+
+  redirect("/dashboard");
+}
+
+async function saveSellerSettings(formData: FormData) {
+  const user = await requireDashboardUser();
+  await ensureSellerProfile(user);
+  const province = readProvince(formData);
+  const city = readCity(formData);
+
+  await prisma.sellerProfile.update({
+    where: {
+      clerk_user_id: user.id,
+    },
+    data: {
+      store_name: readStoreName(formData),
+      seller_address: `${province}, ${city}`,
+      postal_code: readPostalCode(formData),
+      onboarding_completed: true,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/configuracion");
+  revalidatePath("/onboarding");
 }

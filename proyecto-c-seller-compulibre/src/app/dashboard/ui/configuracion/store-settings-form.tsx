@@ -7,6 +7,7 @@ import {
   getArgentinaProvince,
 } from "@/lib/argentina-provinces";
 import {
+  type StoreSettingsAction,
   updateSellerSettings,
   type UpdateStoreSettingsState,
 } from "@/lib/seller-actions";
@@ -38,18 +39,19 @@ type StoreSettingsFormProps = {
   storeName: string;
   sellerAddress?: string | null;
   postalCode?: string | null;
+  action?: StoreSettingsAction;
+  submitLabel?: string;
 };
 
 export function StoreSettingsForm({
   storeName,
   sellerAddress,
   postalCode,
+  action = updateSellerSettings,
+  submitLabel = "Guardar cambios",
 }: StoreSettingsFormProps) {
   const address = parseSellerAddress(sellerAddress);
-  const [state, formAction] = useActionState(
-    updateSellerSettings,
-    initialState
-  );
+  const [state, formAction] = useActionState(action, initialState);
 
   return (
     <form action={formAction} className="flex min-w-0 flex-col gap-5">
@@ -135,7 +137,7 @@ export function StoreSettingsForm({
       ) : null}
 
       <div className="flex justify-end">
-        <FormSubmitButton label="Guardar cambios" />
+        <FormSubmitButton label={submitLabel} />
       </div>
     </form>
   );
