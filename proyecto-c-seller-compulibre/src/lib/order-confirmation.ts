@@ -181,8 +181,22 @@ export async function confirmCatalogOrder(
     }
 
     const sellerId = products[0].seller_id;
+    const seller = await tx.sellerProfile.update({
+      where: {
+        clerk_user_id: sellerId,
+      },
+      data: {
+        next_order_number: {
+          increment: 1,
+        },
+      },
+      select: {
+        next_order_number: true,
+      },
+    });
     const sellerOrder = await tx.sellerOrder.create({
       data: {
+        order_number: seller.next_order_number - 1,
         external_buyer_order_id: input.orderReference,
         buyer_id: input.buyerId,
         buyer_address: input.buyerAddress,
