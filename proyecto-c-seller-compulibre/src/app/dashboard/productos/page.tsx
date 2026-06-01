@@ -6,16 +6,7 @@ import { EditProductButton } from "@/app/dashboard/ui/productos/edit-product-but
 import { Pagination } from "@/app/dashboard/ui/pagination";
 import { Search } from "@/app/dashboard/ui/search";
 import { fetchProductsPage, fetchProductsPages } from "@/lib/data";
-
-function getCurrentPage(page?: string) {
-  const currentPage = Number(page);
-
-  if (!Number.isInteger(currentPage) || currentPage < 1) {
-    return 1;
-  }
-
-  return currentPage;
-}
+import { getCurrentPage } from "@/lib/pagination";
 
 export default async function ProductsPage({
   searchParams,

@@ -43,6 +43,3 @@ export function getArgentinaProvince(value: string) {
   );
 }
 
-export function isArgentinaProvince(value: string): value is ArgentinaProvince {
-  return Boolean(getArgentinaProvince(value));
-}

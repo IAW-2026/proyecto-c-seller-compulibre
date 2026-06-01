@@ -239,23 +239,6 @@ export async function getCatalogProducts(input: CatalogProductsInput = {}) {
   };
 }
 
-export async function getAllCatalogProducts() {
-  const products = await prisma.product.findMany({
-    include: {
-      seller: {
-        select: { store_name: true },
-      },
-      images: {
-        select: { image_url: true },
-        take: 1,
-      },
-    },
-    orderBy: { created_at: "desc" },
-  });
-
-  return products.map(serializeCatalogProduct);
-}
-
 export async function getCatalogProductById(productId: string) {
   const product = await prisma.product.findUnique({
     where: { id: productId },

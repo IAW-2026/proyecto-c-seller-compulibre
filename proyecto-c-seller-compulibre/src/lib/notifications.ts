@@ -1,6 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-
+import { getAuthenticatedSellerId } from "./auth";
 import { prisma } from "./prisma";
 
 export type NotificationRow = {
@@ -10,16 +8,6 @@ export type NotificationRow = {
   href: string | null;
   createdAt: string;
 };
-
-async function getAuthenticatedSellerId() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/");
-  }
-
-  return userId;
-}
 
 export async function fetchUnreadNotifications(): Promise<NotificationRow[]> {
   const sellerId = await getAuthenticatedSellerId();

@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { DeleteProductButton } from "@/app/dashboard/ui/productos/delete-product-button";
 import { EditProductButtonId } from "@/app/dashboard/ui/productos/edit-product-button";
 import { fetchProductById } from "@/lib/data";
+import {
+  getProductCategoryLabel,
+  getProductConditionLabel,
+} from "@/lib/product-labels";
 
 export default async function ProductPage({
   params,
@@ -42,11 +46,15 @@ export default async function ProductPage({
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-gray-500">Categoria</dt>
-              <dd className="font-medium text-gray-950">{product.category}</dd>
+              <dd className="font-medium text-gray-950">
+                {getProductCategoryLabel(product.category)}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-gray-500">Condicion</dt>
-              <dd className="font-medium text-gray-950">{product.condition}</dd>
+              <dd className="font-medium text-gray-950">
+                {getProductConditionLabel(product.condition)}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-gray-500">Estado</dt>
