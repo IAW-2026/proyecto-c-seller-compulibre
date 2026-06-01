@@ -50,7 +50,7 @@ con la capacidad de actualizar el estado de un envio en la pagina.
 
 - La lógica de negocio se mantiene separada del frontend dentro de `src/lib`. Por ejemplo, la confirmación de órdenes, la gestión de productos, los despachos y los webhooks de Shipping se resuelven en módulos independientes.
 
-- Los endpoints utilizados para la comunicación entre aplicaciones requieren API keys enviadas mediante el header `x-api-key`. En producción, si falta una key obligatoria, la solicitud es rechazada. En desarrollo local, `/api/orders/confirm` por ejemplo permite realizar pruebas sin `PAYMENTS_API_KEY`; si la variable está configurada, también se exige localmente. Las api keys se encuentran en el archivo .env.example.
+- Los endpoints utilizados para la comunicación entre aplicaciones requieren API keys enviadas mediante el header `x-api-key`. En producción, si falta una key obligatoria, la solicitud es rechazada. En desarrollo local, `/api/orders/confirm` por ejemplo permite realizar pruebas sin `PAYMENTS_API_KEY`; si la variable está configurada, también se exige localmente. Las api keys se encuentran en el archivo `.env.example`.
 
 - En esta entrega, `/api/orders/confirm` registra la venta luego de confirmar el pago y valida que exista stock suficiente, pero no descuenta automáticamente las unidades. Esta es una limitación conocida y temporal: en la entrega 3 se implementará una reserva previa al pago para evitar inconsistencias cuando dos compradores intenten adquirir la última unidad simultáneamente.
 
