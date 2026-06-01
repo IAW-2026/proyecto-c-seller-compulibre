@@ -15,7 +15,7 @@ Luego iniciar sesion para acceder al dashboard del vendedor.
 
 Usar la cuenta de prueba:
 
-- Email: `selleradmin+clerk_test@example.com`
+- Email: `seller+clerk_test@example.com`
 - Contrasena: `iawuser#`
 - Codigo de confirmacion: 424242
 
