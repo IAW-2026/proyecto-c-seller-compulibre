@@ -1,5 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { isAdminUser, requireDashboardUser } from "@/lib/auth";
 import { fetchUnreadNotifications } from "@/lib/notifications";
@@ -19,6 +20,11 @@ export default async function DashboardLayout({
 }) {
   const user = await requireDashboardUser();
   const seller = await ensureSellerProfile(user);
+
+  if (!seller.onboarding_completed) {
+    redirect("/onboarding");
+  }
+
   const displayName = seller.store_name;
   const email = seller.contact_email;
   const isAdmin = isAdminUser(user);
