@@ -14,6 +14,7 @@ model SellerProfile {
   seller_address String?
   postal_code    String?
   onboarding_completed Boolean @default(false)
+  next_order_number Int @default(1)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
@@ -56,7 +57,7 @@ model ProductImage {
 
 model SellerOrder {
   id                       String   @id @default(cuid())
-  order_number             Int      @unique @default(autoincrement())
+  order_number             Int
   external_buyer_order_id  String
   buyer_id                 String?
   buyer_address            String?
@@ -73,6 +74,7 @@ model SellerOrder {
 
   @@index([seller_id])
   @@index([external_buyer_order_id])
+  @@unique([seller_id, order_number])
 }
 
 model SellerOrderItem {
