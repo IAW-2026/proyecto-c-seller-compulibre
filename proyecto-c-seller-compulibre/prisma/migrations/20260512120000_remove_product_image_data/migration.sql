@@ -1,0 +1,5 @@
+ALTER TABLE "ProductImage"
+DROP COLUMN IF EXISTS "mime_type",
+DROP COLUMN IF EXISTS "original_name",
+DROP COLUMN IF EXISTS "size",
+DROP COLUMN IF EXISTS "image_data";
