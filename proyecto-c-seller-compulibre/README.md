@@ -15,7 +15,7 @@ Luego iniciar sesion para acceder al dashboard del vendedor.
 
 Usar la cuenta de prueba:
 
-- Email: `seller+clerk_test@example.com`
+- Email: `seller+clerk_test@iaw.com`
 - Contrasena: `iawuser#`
 - Codigo de confirmacion: 424242
 
@@ -32,7 +32,7 @@ Clerk:
 
 Tambien existe una cuenta de usuario sin privilegios de administrador creada:
 
-- Email: `usuario+clerk_test@example.com`
+- Email: `usuario+clerk_test@iaw.com`
 - Contraseña: `iawuser#`
 - Codigo de confirmacion: 424242
 
