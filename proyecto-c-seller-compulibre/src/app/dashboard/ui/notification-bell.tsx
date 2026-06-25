@@ -5,7 +5,7 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   markAllNotificationsAsRead,
@@ -19,8 +19,46 @@ export function NotificationBell({
   notifications: NotificationRow[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const unreadCount = notifications.length;
+  const [notificationItems, setNotificationItems] = useState(notifications);
+  const unreadCount = notificationItems.length;
   const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
+
+  useEffect(() => {
+    setNotificationItems(notifications);
+  }, [notifications]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchNotifications() {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      const response = await fetch("/api/notifications", {
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as {
+        notifications?: NotificationRow[];
+      };
+
+      if (isMounted && Array.isArray(payload.notifications)) {
+        setNotificationItems(payload.notifications);
+      }
+    }
+
+    const intervalId = window.setInterval(fetchNotifications, 10000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <div className="relative">
@@ -47,9 +85,9 @@ export function NotificationBell({
             </p>
           </div>
 
-          {notifications.length > 0 ? (
+          {notificationItems.length > 0 ? (
             <div className="max-h-96 overflow-y-auto">
-              {notifications.map((notification) => (
+              {notificationItems.map((notification) => (
                 <div
                   key={notification.id}
                   className="flex gap-3 border-b border-primary/10 px-4 py-3 last:border-b-0"
@@ -84,7 +122,7 @@ export function NotificationBell({
             </p>
           )}
 
-          {notifications.length > 0 ? (
+          {notificationItems.length > 0 ? (
             <form action={markAllNotificationsAsRead}>
               <button
                 type="submit"
