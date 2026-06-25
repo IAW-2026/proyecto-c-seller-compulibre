@@ -64,16 +64,25 @@ function readRequiredString(
   return value.trim();
 }
 
+function readRequiredStringOrNumber(value: unknown, label: string) {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value.toString();
+  }
+
+  throw new OrderConfirmationError(`${label} es obligatorio`);
+}
+
 export function parseConfirmOrderPayload(payload: unknown): ConfirmOrderInput {
   if (!payload || typeof payload !== "object") {
     throw new OrderConfirmationError("El body debe ser un objeto JSON");
   }
 
   const body = payload as Record<string, unknown>;
-  const buyerPostalCode =
-    typeof body.buyerPostalCode === "string"
-      ? body.buyerPostalCode
-      : body.buyerCodigoPostal;
+  const buyerPostalCode = body.buyerPostalCode ?? body.buyerCodigoPostal;
 
   if (!Array.isArray(body.items) || body.items.length === 0) {
     throw new OrderConfirmationError("items debe tener al menos un producto");
@@ -110,8 +119,8 @@ export function parseConfirmOrderPayload(payload: unknown): ConfirmOrderInput {
     orderReference: readRequiredString(body, "orderReference"),
     buyerId: readRequiredString(body, "buyerId"),
     buyerAddress: readRequiredString(body, "buyerAddress"),
-    buyerPostalCode: readRequiredString(
-      { buyerPostalCode },
+    buyerPostalCode: readRequiredStringOrNumber(
+      buyerPostalCode,
       "buyerPostalCode"
     ),
     transactionId: readRequiredString(body, "transactionId"),
